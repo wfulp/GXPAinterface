@@ -37,9 +37,7 @@ If you make a ~/.gxpa file -- see \code{\link[=read_config]{read_config()}} for 
 }
 }
 \examples{
-\dontrun{
 dat <- get_data_from_gxpa(series_id = 151, genes = c("CD33", "CD34"))
 head(dat)
-}
 
 }
