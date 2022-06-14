@@ -49,7 +49,9 @@ If you make a ~/.gxpa file -- see \code{\link[=read_config]{read_config()}} for 
 get_series_info_from_gxpa(151)
 
 all_dat <- get_series_info_from_gxpa()
-head(all_dat)
+all_dat$name[1:10]
+nrow(all_dat)
+table(all_dat$organism)
 
 # Can get series ID based on dataset name
 all_dat$id[all_dat$name == "Beat AML - OHSU"]
