@@ -15,7 +15,8 @@ get_data_from_gxpa(series_id, genes, GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"))
 \code{GXPA_TOKEN}}
 }
 \value{
-
+a data.frame of expression values for selected genes and sample annotation
+information.
 }
 \description{
 Get data from GXPA for a given series id and genes
@@ -24,7 +25,10 @@ Get data from GXPA for a given series id and genes
 Go to \href{https://geneatlas.redda.celgene.com/browse/settings}{GXPA Settings}
 to get your token. Some datasets require you to login, so be sure to do
 that before you copy your token.
-Token can be set globally by: \code{Sys.setenv(GXPA_TOKEN = "XXXXXXXXXXXXXXXX")}
+Token can be set globally by:
+\itemize{
+\item \code{Sys.setenv(GXPA_TOKEN = "XXXXXXXXXXXXXXXX")}
+}
 
 If you make a ~/.gxpa file -- see \code{\link[=read_config]{read_config()}} for more info):
 \itemize{

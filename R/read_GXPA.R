@@ -9,13 +9,16 @@
 #'
 #' @return
 #'
-#'
+#' a data.frame of expression values for selected genes and sample annotation
+#' information.
 #'
 #' @details
 #' Go to [GXPA Settings](https://geneatlas.redda.celgene.com/browse/settings)
 #' to get your token. Some datasets require you to login, so be sure to do
 #' that before you copy your token.
-#' Token can be set globally by: `Sys.setenv(GXPA_TOKEN = "XXXXXXXXXXXXXXXX")`
+#' Token can be set globally by:
+#'
+#'  - `Sys.setenv(GXPA_TOKEN = "XXXXXXXXXXXXXXXX")`
 #'
 #' If you make a ~/.gxpa file -- see [read_config()] for more info):
 #'
