@@ -26,3 +26,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 URL: https://biogit.pri.bms.com/foxb6/GXPAinterface
 BugReports: https://biogit.pri.bms.com/foxb6/GXPAinterface/issues
+Imports:
+  httr
