@@ -47,7 +47,10 @@ If you make a ~/.gxpa file -- see \code{\link[=read_config]{read_config()}} for 
 }
 \examples{
 get_series_info_from_gxpa(151)
+# Can give a numeric vector
+get_series_info_from_gxpa(151:152)
 
+# Can get all available data
 all_dat <- get_series_info_from_gxpa()
 all_dat$name[1:10]
 nrow(all_dat)

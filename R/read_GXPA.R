@@ -36,14 +36,15 @@ get_data_from_gxpa <- function(series_id,
                                GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
 
   # input catching
-  if (!exists('series_id')) {
+  if (missing(series_id)) {
     stop("series_id can't be missing")
   }
-  if (!exists('genes')) {
+  if (missing(genes)) {
     stop("genes can't be missing")
   }
-  if (!exists('GXPA_TOKEN') |
-    GXPA_TOKEN == "") {
+  if (is.null(GXPA_TOKEN) ||
+      is.na(GXPA_TOKEN) ||
+      GXPA_TOKEN == "") {
     stop("GXPA_TOKEN can't be missing")
   }
 
@@ -109,7 +110,10 @@ get_data_from_gxpa <- function(series_id,
 #'
 #' @examples
 #' get_series_info_from_gxpa(151)
+#' # Can give a numeric vector
+#' get_series_info_from_gxpa(151:152)
 #'
+#' # Can get all available data
 #' all_dat <- get_series_info_from_gxpa()
 #' all_dat$name[1:10]
 #' nrow(all_dat)
@@ -120,7 +124,8 @@ get_data_from_gxpa <- function(series_id,
 #'
 get_series_info_from_gxpa <- function(series_id = NULL,
                                       GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
-  if (!exists('GXPA_TOKEN') |
+  if (is.null(GXPA_TOKEN) ||
+      is.na(GXPA_TOKEN) ||
       GXPA_TOKEN == "") {
     stop("GXPA_TOKEN can't be missing")
   }
@@ -146,7 +151,8 @@ get_series_info_from_gxpa <- function(series_id = NULL,
 get_info_from_url <- function(get_url,
                               GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
 
-  if (!exists('GXPA_TOKEN') |
+  if (is.null(GXPA_TOKEN) ||
+      is.na(GXPA_TOKEN) ||
       GXPA_TOKEN == "") {
     stop("GXPA_TOKEN can't be missing")
   }
@@ -157,12 +163,12 @@ get_info_from_url <- function(get_url,
     httr::add_headers(Authorization = paste("Token", GXPA_TOKEN))
   )
   if (r$status_code != 200)
-    stop("Error (status=", r$status_code, ") while reading url:", get_url)
+    stop("Error (status=", r$status_code, ") while reading url: ", get_url)
 
   # get the output content, check if there is an error
   dat.string <- httr::content(r, as = "text", encoding = "utf-8")
   if (grepl("^Error", dat.string))
-    stop("Error getting content from url:", get_url)
+    stop("Error getting content from url: ", get_url)
 
   #parse differently if valid JSON data string
   if (jsonlite::validate(dat.string)[[1]]) {
