@@ -35,7 +35,7 @@ Or install the development version from BMS BioGit with:
 remotes::install_github(repo = "foxb6/GXPAinterface", 
                         host = "https://biogit.pri.bms.comapi/api/v3")
 #or use install_git
-remotes::install_git('https://biogit.pri.bms.com/foxb6/GXPAinterface')
+remotes::install_git('https://biogit.pri.bms.com/foxb6/GXPAinterface.git')
 ```
 
 ## Example
