@@ -15,17 +15,27 @@ Install the released version of `{GXPAinterface}` from BMS RStudio
 Package Manager (BRAN):
 
 ``` r
-install.packages("GXPAinterface", 
-                 repos = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest")
+install.packages(
+  "GXPAinterface", 
+  repos = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"
+)
 ```
 
 Or install the development version from BMS BioGit with:
 
 ``` r
-remotes::install_github(repo = "foxb6/GXPAinterface", 
-                        host = "https://biogit.pri.bms.comapi/api/v3")
-#or use install_git
-remotes::install_git('https://biogit.pri.bms.com/foxb6/GXPAinterface.git')
+remotes::install_github(
+  repo = "IOCT-discovery-preclin/GXPAinterface", 
+  host = "https://biogit.pri.bms.com/api/v3"
+)
+```
+
+or:
+
+``` r
+remotes::install_git(
+  "https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface.git"
+)
 ```
 
 ## Example
@@ -34,7 +44,6 @@ EXAMPLE CODE TBD
 
 ``` r
 library(GXPAinterface)
-## basic example code
 ```
 
 ## Code of Conduct
