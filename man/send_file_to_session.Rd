@@ -40,11 +40,12 @@ for GEO data loading
 }
 \examples{
 \dontrun{
-  tmp_file <- tempfile()
-  utils::write.csv(matrix(rnorm(100), nrow = 10), tmp_file)
-  send_file_to_session(
-    session_id = '7AR22L',
-    filename_local = tmp_file,
-    file_save_name = 'expr.expr.txt')
+tmp_file <- tempfile()
+utils::write.csv(matrix(rnorm(100), nrow = 10), tmp_file)
+send_file_to_session(
+  session_id = "7AR22L",
+  filename_local = tmp_file,
+  file_save_name = "expr.expr.txt"
+)
 }
 }
