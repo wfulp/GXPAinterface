@@ -25,15 +25,18 @@ Get data from GXPA for a given series id and genes
 Go to \href{https://geneatlas.redda.celgene.com/browse/settings}{GXPA Settings}
 to get your token. Some datasets require you to login, so be sure to do
 that before you copy your token.
-Token can be set globally by:
+
+Token can be set by:
+\itemize{
+\item For the current session:
 \itemize{
 \item \code{Sys.setenv(GXPA_TOKEN = "XXXXXXXXXXXXXXXX")}
 }
-
-If you make a ~/.gxpa file -- see \code{\link[=read_config]{read_config()}} for more info):
+\item For all sessions:
 \itemize{
-\item \code{ini = read_config()}
-\item \code{Sys.setenv(GXPA_TOKEN = ini$GXPA_TOKEN)}
+\item \code{usethis::edit_r_environ()},
+\item adding: \code{GXPA_TOKEN = "XXXXXXXXXXXXXXXX"}
+}
 }
 }
 \examples{

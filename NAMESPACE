@@ -2,3 +2,5 @@
 
 export(get_data_from_gxpa)
 export(get_series_info_from_gxpa)
+export(login_and_get_user_cookie)
+export(send_file_to_session)
