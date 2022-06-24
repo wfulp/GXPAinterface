@@ -52,3 +52,76 @@ test_that("testing series info creation", {
     "filename, name, descript, default_group, organism, or expr_units is missing, with no default"
   )
 })
+
+
+
+test_that("testing check_files_for_GXPA", {
+  run_test_checks <- function(test_expr, test_meta) {
+    test_dir <- tempdir()
+    utils::write.table(test_expr,
+      file = file.path(test_dir, "expr.expr.txt"),
+      sep = "\t"
+    )
+    utils::write.csv(test_meta,
+      file = file.path(test_dir, "expr.samples.csv")
+    )
+
+    check_files_for_GXPA(
+      expr_file = file.path(test_dir, "expr.expr.txt"),
+      samples_file = file.path(test_dir, "expr.samples.csv")
+    )
+  }
+
+  test_expr <- data.frame(matrix(1:1000, nrow = 100))
+  colnames(test_expr) <- paste0("Sample", 1:10)
+  rownames(test_expr) <- paste0("Gene", 1:100)
+
+  test_meta <- data.frame(matrix(rep(letters[1:20], 3), nrow = 10))
+  rownames(test_meta) <- colnames(test_expr)
+  colnames(test_meta) <- paste0("Variable", 1:6)
+
+  # success
+  expect_message(
+    run_test_checks(test_expr, test_meta),
+    "All checks passed"
+  )
+  # going throw all errors
+  expect_error(
+    run_test_checks(test_expr[, -1], test_meta),
+    "number of columns of expression data should equal number of rows in metadata"
+  )
+  bad_expr <- test_expr
+  colnames(bad_expr)[1] <- colnames(bad_expr)[2]
+  expect_error(
+    run_test_checks(bad_expr, test_meta),
+    "detected duplicated header values in expr data"
+  )
+  bad_meta <- as.matrix(test_meta)
+  rownames(bad_meta)[1] <- rownames(bad_meta)[2]
+  expect_error(
+    run_test_checks(test_expr, bad_meta),
+    "duplicate 'row.names' are not allowed"
+  )
+  colnames(bad_expr)[2] <- colnames(test_expr)[1]
+  expect_warning(
+    suppressMessages(run_test_checks(bad_expr, test_meta)),
+    "expr data and metadata can be linked, but is not currently \\(i.e. different order\\)"
+  )
+  colnames(bad_expr)[2] <- "Whoops"
+  expect_error(
+    run_test_checks(bad_expr, test_meta),
+    "expr data and metadata can not be linked"
+  )
+  bad_expr <- test_expr
+  rownames(bad_expr)[1] <- toupper(rownames(bad_expr)[2])
+  expect_error(
+    run_test_checks(bad_expr, test_meta),
+    "some of the gene names are duplicated \\(ignoring case\\)"
+  )
+  bad_meta <- test_meta
+  colnames(bad_meta)[2:4] <- c("fsgs fdfv", "sgs-gdfs", "123fadf")
+  expect_error(
+    run_test_checks(test_expr, bad_meta),
+    "the following variable do not follow standard R variable naming convention:\nfsgs fdfv\nsgs-gdfs\n123fadf"
+  )
+})

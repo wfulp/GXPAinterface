@@ -78,30 +78,82 @@ make_series_info_file <- function(filename,
 }
 
 
-under_construction_dont_use_yet___check_files <- function(expr_file, samples_file) {
-  expr1 <- utils::read.table(expr_file, sep = "\t", quote = "", header = TRUE)
-  pd1 <- utils::read.csv(samples_file, header = TRUE, row.names = 1)
+#' Checks Expression and Metadata for Adding to GXPA
+#'
+#' Performs common checks on the expression data and metadata files.
+#' Often run before adding to GXPA
+#'
+#' @param expr_file expression data file name, with path, to check with metadata
+#' @param samples_file metadata data file name, with path, to check with expression data
+#'
+#' @return message indicating all checks passed
+#' @export
+#'
+#' @details The following check are performed:
+#'
+#' - number of columns of expression data not equal to number of rows in metadata
+#' - duplicated expression data column names
+#' - duplicated metadata values in first column
+#' - expression data column names that can't link to metadata samples
+#'   - Will give warning if linking is possible but currently not matching order
+#' - duplicated gene names
+#' - metadata column names that do not follow standard R variable naming convention
+#'
+#' @examples
+#' \dontrun{
+#' check_files_for_GXPA(
+#'   expr_file = "expr.expr.txt",
+#'   samples_file = "expr.samples.csv"
+#' )
+#' }
+check_files_for_GXPA <- function(expr_file,
+                                 samples_file) {
+  expr1 <- utils::read.table(expr_file,
+    sep = "\t",
+    header = TRUE,
+    check.names = FALSE
+  )
+  pd1 <- utils::read.csv(samples_file,
+    header = TRUE,
+    row.names = 1,
+    check.names = FALSE
+  )
 
+  if (ncol(expr1) != nrow(pd1)) {
+    stop("number of columns of expression data should equal number of rows in metadata")
+  }
+
+  # No duplicated genes expr samples and metadata allowed
+  if (any(duplicated(colnames(expr1)))) {
+    stop("detected duplicated header values in expr data")
+  }
+  if (any(duplicated(rownames(pd1)))) {
+    stop("detected duplicated values in metadata sample column")
+  }
+
+  # Check expr samples and metadata linking
   if (!all(rownames(pd1) == colnames(expr1))) {
-    write("Error: Not all metadata rownames are the same as the expr matrix colnames")
+    if (any(is.na(match(rownames(pd1), colnames(expr1))))) {
+      stop("expr data and metadata can not be linked")
+    } else {
+      warning("expr data and metadata can be linked, but is not currently (i.e. different order)")
+    }
   }
 
+  # No duplicated genes allowed
   if (any(duplicated(toupper(rownames(expr1))))) {
-    write("Error: some of the gene names are duplicated after changing all to upper case")
+    stop("some of the gene names are duplicated (ignoring case)")
   }
 
-  colnames.spaces <- colnames(pd1)[grepl(" ", colnames(pd1))]
-  if (length(colnames.spaces) > 0) {
-    write(paste("Error: some metadata colnames have spaces:", paste(colnames.spaces, collapse = ", ")), stderr())
+  # metadata colnames must  follow standard R variable naming convention
+  if (any(make.names(colnames(pd1)) != colnames(pd1))) {
+    stop(
+      "the following variable do not follow standard R variable naming convention:\n",
+      paste(colnames(pd1)[make.names(colnames(pd1)) != colnames(pd1)],
+        collapse = "\n"
+      )
+    )
   }
 
-  colnames.dashes <- colnames(pd1)[grepl("\\-", colnames(pd1))]
-  if (length(colnames.dashes) > 0) {
-    write(paste("Error: some metadata colnames have dashes:", paste(colnames.dashes, collapse = ", ")), stderr())
-  }
-
-  colnames.makenames <- colnames(pd1)[make.names(colnames(pd1)) != colnames(pd1)]
-  if (length(colnames.makenames) > 0) {
-    write(paste("Error: some metadata colnames change when applying make.names():", paste(colnames.makenames, collapse = ", ")), stderr())
-  }
+  message("All checks passed")
 }

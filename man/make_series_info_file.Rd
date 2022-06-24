@@ -50,18 +50,21 @@ writes out csv file of series information to \code{filename} location
 Create Series Info File for GXPA
 }
 \examples{
-filename = tempfile(fileext = '.csv')
+filename <- tempfile(fileext = ".csv")
 make_series_info_file(
   file = filename,
-  series_name = 'SU2C_2019',
-  series_descript = 'Long description',
-  default_group = 'tumor_site',
-  organism = 'human',
-  expr_units = 'RNA seq log2 (FPKM+1)',
+  series_name = "SU2C_2019",
+  series_descript = "Long description",
+  default_group = "tumor_site",
+  organism = "human",
+  expr_units = "RNA seq log2 (FPKM+1)",
   pmid = 31061129,
-  default_color = 'AR_score_group',
-  extra.list = list('Extra_Field' = 'Something',
-                   'Another_one' = 5))
+  default_color = "AR_score_group",
+  extra.list = list(
+    "Extra_Field" = "Something",
+    "Another_one" = 5
+  )
+)
 utils::read.csv(filename)
 
 }
