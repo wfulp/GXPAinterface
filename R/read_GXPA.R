@@ -28,7 +28,7 @@
 #' @export
 #'
 #' @examples
-#' dat <- get_data_from_gxpa(series_id = 151, genes = c("CD33", "CD34"))
+#' dat <- get_data_from_gxpa(series_id = 41, genes = c("CD33", "CD34"))
 #' head(dat)
 #'
 get_data_from_gxpa <- function(series_id,
@@ -109,9 +109,9 @@ get_data_from_gxpa <- function(series_id,
 #' @export
 #'
 #' @examples
-#' get_series_info_from_gxpa(151)
+#' get_series_info_from_gxpa(41)
 #' # Can give a numeric vector
-#' get_series_info_from_gxpa(151:152)
+#' get_series_info_from_gxpa(41:43)
 #'
 #' # Can get all available data
 #' all_dat <- get_series_info_from_gxpa()

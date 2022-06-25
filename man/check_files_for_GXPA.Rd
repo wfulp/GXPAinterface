@@ -34,7 +34,9 @@ The following check are performed:
 }
 \examples{
 \dontrun{
-check_files_for_GXPA(expr_file = "expr.expr.txt",
-                     samples_file = "expr.samples.csv")
+check_files_for_GXPA(
+  expr_file = "expr.expr.txt",
+  samples_file = "expr.samples.csv"
+)
 }
 }
