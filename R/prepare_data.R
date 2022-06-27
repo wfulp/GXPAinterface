@@ -96,7 +96,7 @@ make_series_info_file <- function(filename,
 #' - duplicated metadata values in first column
 #' - expression data column names that can't link to metadata samples
 #'   - Will give warning if linking is possible but currently not matching order
-#' - duplicated gene names
+#' - duplicated gene names (ignoring case)
 #' - metadata column names that do not follow standard R variable naming convention
 #'
 #' @examples

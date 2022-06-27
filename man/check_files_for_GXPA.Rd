@@ -28,7 +28,7 @@ The following check are performed:
 \itemize{
 \item Will give warning if linking is possible but currently not matching order
 }
-\item duplicated gene names
+\item duplicated gene names (ignoring case)
 \item metadata column names that do not follow standard R variable naming convention
 }
 }
