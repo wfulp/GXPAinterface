@@ -7,7 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://img.shields.io/badge/codecov-94%25-green.svg)](https://biogit.pri.bms.com/KSR/bmsconnectwidgets)
+[![](https://img.shields.io/badge/codecov-94%25-green.svg)](https://covr.r-lib.org/)
 <!-- badges: end -->
 
 ## Overview

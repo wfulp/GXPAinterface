@@ -27,7 +27,7 @@ per_cov <- round(covr::percent_coverage(pgk_cov))
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-`r  badger::badge_custom('codecov', paste0(per_cov,'%25'), color = 'green', url = 'https://biogit.pri.bms.com/KSR/bmsconnectwidgets')`
+`r  badger::badge_custom('codecov', paste0(per_cov,'%25'), color = 'green', url = 'https://covr.r-lib.org/')`
 <!-- badges: end -->
 
 ## Overview
