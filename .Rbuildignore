@@ -6,3 +6,6 @@
 ^\.github$
 ^CODE_OF_CONDUCT\.md$
 ^domino\.Rhistory$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
