@@ -40,7 +40,7 @@ Token can be set by:
 }
 }
 \examples{
-dat <- get_data_from_gxpa(series_id = 151, genes = c("CD33", "CD34"))
+dat <- get_data_from_gxpa(series_id = 41, genes = c("CD33", "CD34"))
 head(dat)
 
 }

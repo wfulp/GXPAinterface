@@ -49,9 +49,9 @@ Token can be set by:
 }
 }
 \examples{
-get_series_info_from_gxpa(151)
+get_series_info_from_gxpa(41)
 # Can give a numeric vector
-get_series_info_from_gxpa(151:152)
+get_series_info_from_gxpa(41:43)
 
 # Can get all available data
 all_dat <- get_series_info_from_gxpa()
