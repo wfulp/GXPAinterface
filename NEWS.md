@@ -1,3 +1,3 @@
-# GXPAinterface 0.0.0.9000
+# GXPAinterface 0.1.0
 
 * First version
