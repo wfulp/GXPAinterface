@@ -16,8 +16,8 @@
 #'    - `Sys.setenv(GXPA_password = "XXXXXXXXXXXXXXXX")`
 #'  - For all sessions:
 #'    - `usethis::edit_r_environ()`,
-#'    - adding: `GXPA_username = "XXXXXXXXXXXXXXXX"`
-#'    - adding: `GXPA_password = "XXXXXXXXXXXXXXXX"`
+#'    - adding: `GXPA_USERNAME = "XXXXXXXXXXXXXXXX"`
+#'    - adding: `GXPA_PASSWORD = "XXXXXXXXXXXXXXXX"`
 #' @export
 #'
 #' @examples
