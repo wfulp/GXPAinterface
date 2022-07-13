@@ -117,8 +117,6 @@ check_files_for_GXPA <- function(expr_file,
                              quote = ''
   )
   pd1 <- utils::read.csv(samples_file,
-                         header = TRUE,
-                         row.names = 1,
                          check.names = FALSE
   )
 
@@ -141,13 +139,14 @@ check_files_for_GXPA <- function(expr_file,
   if (any(duplicated(colnames(expr1)))) {
     stop("Detected duplicated header values in expr data")
   }
-  if (any(duplicated(rownames(pd1)))) {
+
+  if (any(duplicated(pd1[,1]))) {
     stop("Detected duplicated values in metadata sample column")
   }
 
   # Check expr samples and metadata linking
-  if (!all(rownames(pd1) == colnames(expr1))) {
-    if (any(is.na(match(rownames(pd1), colnames(expr1))))) {
+  if (!all(pd1[,1] == colnames(expr1))) {
+    if (any(is.na(match(pd1[,1], colnames(expr1))))) {
       stop("expr data and metadata can not be linked")
     } else {
       warning("expr data and metadata can be linked, but is not currently (i.e. different order)")

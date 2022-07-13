@@ -64,7 +64,8 @@ test_that("testing check_files_for_GXPA", {
       quote = quote
     )
     utils::write.csv(test_meta,
-      file = file.path(test_dir, "expr.samples.csv")
+      file = file.path(test_dir, "expr.samples.csv"),
+      row.names = FALSE
     )
 
     check_files_for_GXPA(
@@ -77,9 +78,11 @@ test_that("testing check_files_for_GXPA", {
   colnames(test_expr) <- paste0("Sample", 1:10)
   rownames(test_expr) <- paste0("Gene", 1:100)
 
-  test_meta <- data.frame(matrix(rep(letters[1:20], 3), nrow = 10))
-  rownames(test_meta) <- colnames(test_expr)
-  colnames(test_meta) <- c('_id', paste0("Variable", 2:6))
+  test_meta <- cbind(
+    colnames(test_expr),
+    data.frame(matrix(rep(letters[1:20], 3), nrow = 10))
+  )
+  colnames(test_meta) <- c('_id', paste0("Variable", 1:6))
 
   # success
   expect_message(
@@ -91,7 +94,7 @@ test_that("testing check_files_for_GXPA", {
     run_test_checks(test_expr[, -1], test_meta),
     "Number of columns of expression data should equal number of rows in metadata"
   )
-  bad_meta <- as.matrix(test_meta)
+  bad_meta <- test_meta
   colnames(bad_meta)[1] <- 'badname'
   expect_error(
     run_test_checks(test_expr, bad_meta),
@@ -107,11 +110,11 @@ test_that("testing check_files_for_GXPA", {
     run_test_checks(bad_expr, test_meta),
     "Detected duplicated header values in expr data"
   )
-  bad_meta <- as.matrix(test_meta)
-  rownames(bad_meta)[1] <- rownames(bad_meta)[2]
+  bad_meta <- test_meta
+  bad_meta[1,1] <- bad_meta[2,1]
   expect_error(
     run_test_checks(test_expr, bad_meta),
-    "duplicate 'row.names' are not allowed"
+    "Detected duplicated values in metadata sample column"
   )
   colnames(bad_expr)[2] <- colnames(test_expr)[1]
   expect_warning(
