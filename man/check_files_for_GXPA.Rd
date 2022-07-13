@@ -22,6 +22,7 @@ Often run before adding to GXPA
 The following check are performed:
 \itemize{
 \item number of columns of expression data not equal to number of rows in metadata
+\item check for entirely quoted column names or row names in expr file
 \item duplicated expression data column names
 \item duplicated metadata values in first column
 \item expression data column names that can't link to metadata samples
@@ -29,7 +30,8 @@ The following check are performed:
 \item Will give warning if linking is possible but currently not matching order
 }
 \item duplicated gene names (ignoring case)
-\item metadata column names that do not follow standard R variable naming convention
+\item first column name of metadata must be an empty string of \verb{_id}
+\item other column names of metadata must follow standard R variable naming convention
 }
 }
 \examples{

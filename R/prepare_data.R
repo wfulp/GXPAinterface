@@ -92,12 +92,14 @@ make_series_info_file <- function(filename,
 #' @details The following check are performed:
 #'
 #' - number of columns of expression data not equal to number of rows in metadata
+#' - check for entirely quoted column names or row names in expr file
 #' - duplicated expression data column names
 #' - duplicated metadata values in first column
 #' - expression data column names that can't link to metadata samples
 #'   - Will give warning if linking is possible but currently not matching order
 #' - duplicated gene names (ignoring case)
-#' - metadata column names that do not follow standard R variable naming convention
+#' - first column name of metadata must be an empty string of `_id`
+#' - other column names of metadata must follow standard R variable naming convention
 #'
 #' @examples
 #' \dontrun{
@@ -109,26 +111,38 @@ make_series_info_file <- function(filename,
 check_files_for_GXPA <- function(expr_file,
                                  samples_file) {
   expr1 <- utils::read.table(expr_file,
-    sep = "\t",
-    header = TRUE,
-    check.names = FALSE
+                             sep = "\t",
+                             header = TRUE,
+                             check.names = FALSE,
+                             quote = ''
   )
   pd1 <- utils::read.csv(samples_file,
-    header = TRUE,
-    row.names = 1,
-    check.names = FALSE
+                         header = TRUE,
+                         row.names = 1,
+                         check.names = FALSE
   )
 
   if (ncol(expr1) != nrow(pd1)) {
-    stop("number of columns of expression data should equal number of rows in metadata")
+    stop("Number of columns of expression data should equal number of rows in metadata")
+  }
+
+  # Checking sample header starts with "" or "_id"
+  if (!colnames(pd1)[1] %in% c("_id", "")) {
+    stop('The first column name of the metadata must be an empty string or "_id"')
+  }
+
+  # Checking for quoted colnames or rownames
+  if (all(grepl('"', colnames(expr1))) || all(grepl('"', colnames(expr1)))) {
+    stop('Detected quotes in all expr data column names or row names. ',
+         'Check to make sure "quote = FALSE" is used when writing expr data')
   }
 
   # No duplicated genes expr samples and metadata allowed
   if (any(duplicated(colnames(expr1)))) {
-    stop("detected duplicated header values in expr data")
+    stop("Detected duplicated header values in expr data")
   }
   if (any(duplicated(rownames(pd1)))) {
-    stop("detected duplicated values in metadata sample column")
+    stop("Detected duplicated values in metadata sample column")
   }
 
   # Check expr samples and metadata linking
@@ -142,15 +156,17 @@ check_files_for_GXPA <- function(expr_file,
 
   # No duplicated genes allowed
   if (any(duplicated(toupper(rownames(expr1))))) {
-    stop("some of the gene names are duplicated (ignoring case)")
+    stop("Some of the gene names are duplicated (ignoring case)")
   }
 
-  # metadata colnames must  follow standard R variable naming convention
-  if (any(make.names(colnames(pd1)) != colnames(pd1))) {
+  # metadata colnames must follow standard R variable naming convention
+  # except first case
+  meta_varnames <- colnames(pd1)[-1]
+  if (any(make.names(meta_varnames) != meta_varnames)) {
     stop(
-      "the following variable do not follow standard R variable naming convention:\n",
-      paste(colnames(pd1)[make.names(colnames(pd1)) != colnames(pd1)],
-        collapse = "\n"
+      "The following variable do not follow standard R variable naming convention:\n",
+      paste(meta_varnames[make.names(meta_varnames) != meta_varnames],
+            collapse = "\n"
       )
     )
   }
