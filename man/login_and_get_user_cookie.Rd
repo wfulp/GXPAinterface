@@ -11,10 +11,10 @@ login_and_get_user_cookie(
 }
 \arguments{
 \item{GXPA_username}{username for GXPA. Default is to use the environment variable
-\code{GXPA_username}}
+\code{GXPA_USERNAME}}
 
 \item{GXPA_password}{password for GXPA. Default is to use the environment variable
-\code{GXPA_password}}
+\code{GXPA_PASSWORD}}
 }
 \value{
 user cookie
@@ -27,14 +27,14 @@ Uses GXPA username and password to log into GXPA and get user cookie
 \itemize{
 \item For the current session:
 \itemize{
-\item \code{Sys.setenv(GXPA_username = "XXXXXXXXXXXXXXXX")}
-\item \code{Sys.setenv(GXPA_password = "XXXXXXXXXXXXXXXX")}
+\item \code{Sys.setenv(GXPA_USERNAME = "XXXXXXXXXXXXXXXX")}
+\item \code{Sys.setenv(GXPA_PASSWORD = "XXXXXXXXXXXXXXXX")}
 }
 \item For all sessions:
 \itemize{
 \item \code{usethis::edit_r_environ()},
-\item adding: \code{GXPA_username = "XXXXXXXXXXXXXXXX"}
-\item adding: \code{GXPA_password = "XXXXXXXXXXXXXXXX"}
+\item adding: \code{GXPA_USERNAME = XXXXXXXXXXXXXXXX}
+\item adding: \code{GXPA_PASSWORD = XXXXXXXXXXXXXXXX}
 }
 }
 }

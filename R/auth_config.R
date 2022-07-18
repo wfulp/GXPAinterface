@@ -3,21 +3,21 @@
 #' Uses GXPA username and password to log into GXPA and get user cookie
 #'
 #' @param GXPA_username username for GXPA. Default is to use the environment variable
-#' `GXPA_username`
+#' `GXPA_USERNAME`
 #' @param GXPA_password password for GXPA. Default is to use the environment variable
-#' `GXPA_password`
+#' `GXPA_PASSWORD`
 #'
 #' @return user cookie
 #' @details
 #' `GXPA_username` and `GXPA_password` can be set by:
 #'
 #'  - For the current session:
-#'    - `Sys.setenv(GXPA_username = "XXXXXXXXXXXXXXXX")`
-#'    - `Sys.setenv(GXPA_password = "XXXXXXXXXXXXXXXX")`
+#'    - `Sys.setenv(GXPA_USERNAME = "XXXXXXXXXXXXXXXX")`
+#'    - `Sys.setenv(GXPA_PASSWORD = "XXXXXXXXXXXXXXXX")`
 #'  - For all sessions:
 #'    - `usethis::edit_r_environ()`,
-#'    - adding: `GXPA_USERNAME = "XXXXXXXXXXXXXXXX"`
-#'    - adding: `GXPA_PASSWORD = "XXXXXXXXXXXXXXXX"`
+#'    - adding: `GXPA_USERNAME = XXXXXXXXXXXXXXXX`
+#'    - adding: `GXPA_PASSWORD = XXXXXXXXXXXXXXXX`
 #' @export
 #'
 #' @examples
