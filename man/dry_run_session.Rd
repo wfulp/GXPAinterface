@@ -17,14 +17,14 @@ dry_run_session(
 since it checks all the lines of the expression matrix}
 
 \item{user_cookie}{Optional: the cookie string. Can use
-login_and_get_user_cookie() to get it. If you don't provide the cookie
+\code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
 }
 \value{
 Invisibly returns a list with 3 elements: $output has the full html
-output of the dry run. $errors has any errors (also printed to stderr),
-and $warnings has any warnings (also printed to stderr)/
+output of the dry run. $errors has any errors,
+and $warnings has any warnings
 }
 \description{
 This function will trigger the app to execute a dry run of
@@ -34,7 +34,7 @@ run and split any errors or warnings into separate list elements. output
 list has $output $errors and $warnings. If you don't assign the output
 to a variable then errors and warnings will only be printed to stderr.
 
-After the dry run is successful you can run \code{load_session()} in order
+After the dry run is successful you can run \code{\link[=load_session]{load_session()}} in order
 to trigger a task on the app which loads the data from the session and
 into the app database.
 }

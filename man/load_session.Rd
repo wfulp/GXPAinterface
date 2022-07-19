@@ -16,7 +16,7 @@ load_session(
 \item{load.type}{Default 'upload_new'. See description above for more choices.}
 
 \item{user_cookie}{Optional: the cookie string. Can use
-login_and_get_user_cookie() to get it. If you don't provide the cookie
+\code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
 }

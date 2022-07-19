@@ -94,9 +94,9 @@ send_file_to_session <- function(session_id,
 #'      /sessions/new_session. It will create a new session (staging area)
 #'      in order to put the data files prior to loading into the database
 #'      portion of the app. After making a new session, then run
-#'      `send_file_to_session()` for the required files. You can make sure the
-#'      files have no warnings or errors by running `dry_run_session()`. Then
-#'      you can run `load_session()` in order to trigger a task on the app
+#'      [send_file_to_session()] for the required files. You can make sure the
+#'      files have no warnings or errors by running [dry_run_session()]. Then
+#'      you can run [load_session()] in order to trigger a task on the app
 #'      which loads the data from the session and into the app database.
 #'
 #' @param session_name Required: the name of the new session in the app
@@ -104,8 +104,8 @@ send_file_to_session <- function(session_id,
 #' @param session_type The type of session to begin: expr (default), GEO,
 #' features, extract, analysis
 #' @param user_cookie the cookie string. Can use
-#'      `[login_and_get_user_cookie()]` to get it. If you don't provide the cookie
-#'      string, then the function will run `[login_and_get_user_cookie()`]. So, if
+#'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
+#'      string, then the function will run [login_and_get_user_cookie()]. So, if
 #'      you provide the cookie then it saves one interaction with the server.
 #'
 #' @return If successful, the session ID (6 characters) will be returned, and
@@ -189,7 +189,7 @@ begin_new_session <- function(
 #'    list has $output $errors and $warnings. If you don't assign the output
 #'    to a variable then errors and warnings will only be printed to stderr.
 #'
-#'    After the dry run is successful you can run `load_session()` in order
+#'    After the dry run is successful you can run [load_session()] in order
 #'    to trigger a task on the app which loads the data from the session and
 #'    into the app database.
 #'
@@ -197,13 +197,13 @@ begin_new_session <- function(
 #' @param run.type Default 'quick' another choice is 'full' which takes longer
 #'    since it checks all the lines of the expression matrix
 #' @param user_cookie Optional: the cookie string. Can use
-#'      login_and_get_user_cookie() to get it. If you don't provide the cookie
+#'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
 #'
 #' @return Invisibly returns a list with 3 elements: $output has the full html
-#'     output of the dry run. $errors has any errors (also printed to stderr),
-#'     and $warnings has any warnings (also printed to stderr)/
+#'     output of the dry run. $errors has any errors,
+#'     and $warnings has any warnings
 #'
 #' @examples
 #' \dontrun{
@@ -279,7 +279,7 @@ dry_run_session <- function(session_id,
 #' @param session_id Required: the id of session
 #' @param load.type Default 'upload_new'. See description above for more choices.
 #' @param user_cookie Optional: the cookie string. Can use
-#'      login_and_get_user_cookie() to get it. If you don't provide the cookie
+#'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
 #'
@@ -307,12 +307,14 @@ load_session <- function(session_id,
   }
 
   # build the URL to access the data and get the csrf token
-  post_url <- paste0("https://geneatlas.redda.celgene.com/", "load_expr/", load.type, "?cur_session=", session_id)
+  post_url <- paste0("https://geneatlas.redda.celgene.com/", "load_expr/",
+                     load.type, "?cur_session=", session_id)
   resp1 <- httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
   csrf_token <- get_cookie_value(resp1, "csrftoken")
 
   resp1_text <- httr::content(resp1, as = "text")
-  if (grepl("Error: This type of data loading action", resp1_text, fixed = T)) {
+  if (grepl("Error: This type of data loading action",
+            resp1_text, fixed = TRUE)) {
     stop(
       "Did not submit load task because that load type is not ",
       "currently allowed given the state of the database"
@@ -331,18 +333,19 @@ load_session <- function(session_id,
   resp2$request
   resp_text <- httr::content(resp2, as = "text")
 
-  if (grepl("Page not found", ignore.case = T, resp_text)) {
+  if (grepl("Page not found", ignore.case = TRUE, resp_text)) {
     stop("load.type is not an option: ", load.type)
-  } else if (grepl("Error: This type of data loading action", resp_text, fixed = T)) {
-    write("Error: did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ", stderr())
-  } else if (grepl("cannot permit that action:", resp_text, fixed = T)) {
-    write("Error: cannot permit that load.type action", stderr())
+  } else if (grepl("Error: This type of data loading action",
+                   resp_text, fixed = TRUE)) {
+    message("Error: did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ")
+  } else if (grepl("cannot permit that action:", resp_text, fixed = TRUE)) {
+    message("Error: cannot permit that load.type action")
   } else if (grepl("Messages:.*num_inserted", resp_text)) {
-    write("Success - data saved", stderr())
-  } else if (grepl("saved into task queue:", resp_text, fixed = T)) {
-    write("Success - loaded into task queue", stderr())
+    message("Success - data saved")
+  } else if (grepl("saved into task queue:", resp_text, fixed = TRUE)) {
+    message("Success - loaded into task queue")
   } else {
-    write("Error: did not receive confirmation message", stderr())
+    message("Error: did not receive confirmation message")
   }
   invisible(resp_text)
 }

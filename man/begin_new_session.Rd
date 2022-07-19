@@ -18,8 +18,8 @@ begin_new_session(
 features, extract, analysis}
 
 \item{user_cookie}{the cookie string. Can use
-\verb{[login_and_get_user_cookie()]} to get it. If you don't provide the cookie
-string, then the function will run \verb{[login_and_get_user_cookie()}]. So, if
+\code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
+string, then the function will run \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}}. So, if
 you provide the cookie then it saves one interaction with the server.}
 }
 \value{
@@ -31,9 +31,9 @@ This will use the form on the app located at the URL path of
 /sessions/new_session. It will create a new session (staging area)
 in order to put the data files prior to loading into the database
 portion of the app. After making a new session, then run
-\code{send_file_to_session()} for the required files. You can make sure the
-files have no warnings or errors by running \code{dry_run_session()}. Then
-you can run \code{load_session()} in order to trigger a task on the app
+\code{\link[=send_file_to_session]{send_file_to_session()}} for the required files. You can make sure the
+files have no warnings or errors by running \code{\link[=dry_run_session]{dry_run_session()}}. Then
+you can run \code{\link[=load_session]{load_session()}} in order to trigger a task on the app
 which loads the data from the session and into the app database.
 }
 \examples{
