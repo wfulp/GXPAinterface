@@ -4,7 +4,11 @@
 \alias{get_GXPA_session_list}
 \title{Get a dataframe of all sessions}
 \usage{
-get_GXPA_session_list()
+get_GXPA_session_list(GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"))
+}
+\arguments{
+\item{GXPA_TOKEN}{GXPA API token. Default is to use the environment variable
+\code{GXPA_TOKEN}}
 }
 \value{
 If successful, a dataframe of sessions and info about
@@ -15,7 +19,7 @@ Like going to the page /sessions
 \examples{
 \dontrun{
 out.df <- get_GXPA_session_list()
-out.df[grepl("Blueprint", out.df$name, ignore.case = T), ]
+out.df[grepl("blueprint", out.df$name), ]
 session_id <- out.df[grepl("blueprint", out.df$name), "id"]
 }
 }

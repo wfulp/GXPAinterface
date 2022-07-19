@@ -352,6 +352,9 @@ load_session <- function(session_id,
 #'
 #' @description Like going to the page /sessions
 #'
+#' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
+#' `GXPA_TOKEN`
+#'
 #' @return If successful, a dataframe of sessions and info about
 #' @export
 #'
@@ -360,27 +363,29 @@ load_session <- function(session_id,
 #' @examples
 #' \dontrun{
 #' out.df <- get_GXPA_session_list()
-#' out.df[grepl("Blueprint", out.df$name, ignore.case = T), ]
+#' out.df[grepl("blueprint", out.df$name), ]
 #' session_id <- out.df[grepl("blueprint", out.df$name), "id"]
 #' }
-get_GXPA_session_list <- function() {
-  session_url <- paste0("https://geneatlas.redda.celgene.com/", "remote/api")
-  dat <- get_info_from_url(session_url)
-  dat$user
+get_GXPA_session_list <- function(GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
+  session_url <- "https://geneatlas.redda.celgene.com/remote/api"
+  dat <- get_info_from_url(session_url, GXPA_TOKEN)
 
   out.df <- NULL
   for (cur.id in names(dat$sessions)) {
     cur <- dat$sessions[[cur.id]]
 
     # perm is sometimes NULL and that causes as.data.frame to fail
-    if (is.null(cur$perm)) cur$perm <- 0
+    if (is.null(cur$perm)) {
+      cur$perm <- 0
+    }
 
     # make sure everything works ok
     tryCatch(
       {
         cur.df <- as.data.frame(cur)
       },
-      error = function(e) message(paste("Cannot convert to dataframe:", cur[[1]]))
+      error = function(e) message(paste("Cannot convert to dataframe:",
+                                        cur[[1]]))
     )
     cur.df$id <- cur.id
 
@@ -391,26 +396,34 @@ get_GXPA_session_list <- function() {
         {
           out.df <- rbind(out.df, cur.df)
         },
-        error = function(e) message(paste("Cannot combine with previous:", cur[[1]]))
+        error = function(e) message(paste("Cannot combine with previous:",
+                                          cur[[1]]))
       )
     }
   }
-  head(out.df)
-  dim(out.df)
-
-  return(out.df)
+  out.df
 }
 
 
-# get_GXPA_session_details("IKAV1T")
-get_GXPA_session_details <- function(session_id) {
+#' Get a GXPA session details
+#'
+#' @param session_id GXPA session id
+#' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
+#' `GXPA_TOKEN`
+#'
+#' @return list of session details
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' get_GXPA_session_details('5KPU1F')
+#' }
+get_GXPA_session_details <- function(session_id,
+                                     GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
   session_url <- paste0(
     "https://geneatlas.redda.celgene.com/",
     "remote/api?expr_details=1&dir=1&cur_session=",
     session_id
   )
-  dat <- get_info_from_url(session_url)
-  dat$user
-
-  return(dat)
+  get_info_from_url(session_url, GXPA_TOKEN)
 }
