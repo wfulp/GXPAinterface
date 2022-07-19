@@ -39,9 +39,9 @@ submission was successul or if there was a problem.
 \examples{
 \dontrun{
 # This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
-load_session("X1NBJK", load.type="upload_new")
-load_session("X1NBJK", load.type="upload_new")
-load_session("X1NBJK", load.type="load_scores")
+load_session("X1NBJK", load.type = "upload_new")
+load_session("X1NBJK", load.type = "upload_new")
+load_session("X1NBJK", load.type = "load_scores")
 }
 
 }

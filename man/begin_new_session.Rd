@@ -2,11 +2,11 @@
 % Please edit documentation in R/uploadfile.R
 \name{begin_new_session}
 \alias{begin_new_session}
-\title{Begin a new session}
+\title{Begin a new GXPA session}
 \usage{
 begin_new_session(
   session_name,
-  session_type = "expr",
+  session_type = c("expr", "GEO", "features", "extract", "analysis"),
   user_cookie = login_and_get_user_cookie()
 )
 }
@@ -14,17 +14,17 @@ begin_new_session(
 \item{session_name}{Required: the name of the new session in the app
 (letters, numbers and underscores only)}
 
-\item{session_type}{Default 'expr' - no other options tested (but the app
-also has session types named 'GEO', 'features', 'extract', 'analysis')}
+\item{session_type}{The type of session to begin: expr (default), GEO,
+features, extract, analysis}
 
-\item{user_cookie}{Optional: the cookie string. Can use
-login_and_get_user_cookie() to get it. If you don't provide the cookie
-string, then the function will run login_and_get_user_cookie(). So, if
+\item{user_cookie}{the cookie string. Can use
+\verb{[login_and_get_user_cookie()]} to get it. If you don't provide the cookie
+string, then the function will run \verb{[login_and_get_user_cookie()}]. So, if
 you provide the cookie then it saves one interaction with the server.}
 }
 \value{
 If successful, the session ID (6 characters) will be returned, and
-it can be used for other session fxns
+it can be used for other session functions
 }
 \description{
 This will use the form on the app located at the URL path of
@@ -38,8 +38,8 @@ which loads the data from the session and into the app database.
 }
 \examples{
 \dontrun{
-user_cookie = login_and_get_user_cookie()
-begin_new_session("new_test_session", user_cookie=user_cookie)
+user_cookie <- login_and_get_user_cookie()
+begin_new_session("new_test_session", user_cookie = user_cookie)
 }
 }
 \seealso{

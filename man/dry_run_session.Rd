@@ -40,10 +40,10 @@ into the app database.
 }
 \examples{
 \dontrun{
-user_cookie = login_and_get_user_cookie()
-tmp=dry_run_session("VLZHJS", user_cookie = user_cookie)
-tmp=dry_run_session("8T3X5G", user_cookie = user_cookie)
-tmp=dry_run_session("8P9JD3", user_cookie = user_cookie)
+user_cookie <- login_and_get_user_cookie()
+tmp <- dry_run_session("VLZHJS", user_cookie = user_cookie)
+tmp <- dry_run_session("8T3X5G", user_cookie = user_cookie)
+tmp <- dry_run_session("8P9JD3", user_cookie = user_cookie)
 }
 
 }

@@ -14,9 +14,9 @@ Like going to the page /sessions
 }
 \examples{
 \dontrun{
-out.df = get_GXPA_session_list()
-out.df[grepl("Blueprint", out.df$name, ignore.case=T),]
-session_id = out.df[grepl("blueprint", out.df$name), "id"]
+out.df <- get_GXPA_session_list()
+out.df[grepl("Blueprint", out.df$name, ignore.case = T), ]
+session_id <- out.df[grepl("blueprint", out.df$name), "id"]
 }
 }
 \seealso{

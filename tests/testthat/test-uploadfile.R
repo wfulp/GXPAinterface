@@ -1,4 +1,4 @@
-test_that("testing various errors and success", {
+test_that("testing send_file_to_session() errors and success", {
   tmp_file <- tempfile()
   utils::write.csv(matrix(rnorm(100), nrow = 10), tmp_file)
 
@@ -47,3 +47,24 @@ test_that("testing various errors and success", {
     paste0("Successfully uploaded expr.expr.txt\\(from ", tmp_file, "\\)")
   )
 })
+
+
+test_that("testing begin_new_session() errors and success", {
+
+  expect_equal(
+    suppressWarnings(
+      begin_new_session(session_name = "test_GXPAinterface")),
+    "7AR22L"
+  )
+  expect_warning(
+    begin_new_session(session_name = "test_GXPAinterface"),
+    "did not make new session since one with that name already exists, and its session_id is returned"
+  )
+
+  expect_error(
+    begin_new_session(session_name = "abcd", user_cookie = 'bad_cookie'),
+    "did not receive message saying session was made"
+  )
+
+})
+

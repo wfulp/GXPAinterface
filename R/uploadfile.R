@@ -88,7 +88,7 @@ send_file_to_session <- function(session_id,
 }
 
 
-#' Begin a new session
+#' Begin a new GXPA session
 #'
 #' @description This will use the form on the app located at the URL path of
 #'      /sessions/new_session. It will create a new session (staging area)
@@ -101,69 +101,83 @@ send_file_to_session <- function(session_id,
 #'
 #' @param session_name Required: the name of the new session in the app
 #'      (letters, numbers and underscores only)
-#' @param session_type Default 'expr' - no other options tested (but the app
-#'      also has session types named 'GEO', 'features', 'extract', 'analysis')
-#' @param user_cookie Optional: the cookie string. Can use
-#'      login_and_get_user_cookie() to get it. If you don't provide the cookie
-#'      string, then the function will run login_and_get_user_cookie(). So, if
+#' @param session_type The type of session to begin: expr (default), GEO,
+#' features, extract, analysis
+#' @param user_cookie the cookie string. Can use
+#'      `[login_and_get_user_cookie()]` to get it. If you don't provide the cookie
+#'      string, then the function will run `[login_and_get_user_cookie()`]. So, if
 #'      you provide the cookie then it saves one interaction with the server.
 #'
 #' @return If successful, the session ID (6 characters) will be returned, and
-#'      it can be used for other session fxns
+#'      it can be used for other session functions
 #' @export
 #'
 #' @seealso [dry_run_session()], [load_session()]
 #'
 #' @examples
 #' \dontrun{
-#' user_cookie = login_and_get_user_cookie()
-#' begin_new_session("new_test_session", user_cookie=user_cookie)
+#' user_cookie <- login_and_get_user_cookie()
+#' begin_new_session("new_test_session", user_cookie = user_cookie)
 #' }
-begin_new_session <- function(session_name,
-                              session_type="expr",
-                              user_cookie=login_and_get_user_cookie()) {
+begin_new_session <- function(
+    session_name,
+    session_type = c("expr", "GEO", "features", "extract", "analysis"),
+    user_cookie = login_and_get_user_cookie()) {
+
+  session_type <- match.arg(session_type)
 
   # build the URL to access the data
-  post_url = paste0("https://geneatlas.redda.celgene.com/", 'sessions/new_session')
+  post_url <- "https://geneatlas.redda.celgene.com/sessions/new_session"
 
   # first need to load the form via GET to get the CSRF token
-  resp1 = httr::GET(post_url, httr::set_cookies(sessionid=user_cookie))
+  resp1 <- httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
 
   # get the csrf token
-  csrf_token = get_cookie_value(resp1, "csrftoken")
+  csrf_token <- get_cookie_value(resp1, "csrftoken")
 
-  if (F) {
-    resp1$request
-    resp1$cookies
-    csrf_token
-  }
+  resp2 <- httr::POST(post_url,
+    httr::add_headers(Referer = post_url),
+    httr::set_cookies(sessionid = user_cookie),
+    body = list(
+      new_session_name = session_name,
+      session_type = session_type,
+      csrfmiddlewaretoken = csrf_token
+    )
+  )
 
-  resp2 = httr::POST(post_url,
-                     httr::add_headers(Referer=post_url),
-                     httr::set_cookies(sessionid=user_cookie),
-                     body = list(new_session_name=session_name,
-                                 session_type=session_type,
-                                 csrfmiddlewaretoken=csrf_token))
-  resp2$request
-  resp_text = httr::content(resp2, as="text")
+  resp_text <- httr::content(resp2, as = "text")
 
-  if (grepl(paste0("Select a valid choice. ", session_type, " is not one of the available choices"),
-            resp_text)) {
+  if (grepl(
+    paste0("Select a valid choice. ",
+           session_type,
+           " is not one of the available choices"),
+    resp_text
+  )) {
     stop(paste0("session_type is not allowed: ", session_type))
   }
 
-  if (grepl(paste0("Name [", session_name, "] has already been used, pick a different name"),
-            resp_text, fixed = T)) {
-    write("Warning: did not make new session since one with that name already exists, and its session_id is returned", stderr())
-  } else if (grepl(paste0("Made new session [",session_name,"]"), resp_text, fixed=T)) {
-    write("Success", stderr())
+  if (grepl(paste0("Name [",
+                   session_name,
+                   "] has already been used, pick a different name"),
+            resp_text,
+            fixed = TRUE
+  )) {
+    warning("did not make new session since one with that name already exists,",
+            " and its session_id is returned")
+  } else if ((grepl(paste0("Made new session [", session_name, "]"),
+                   resp_text,
+                   fixed = TRUE)) ||
+             (session_type == 'features' &&
+              grepl("Made custom session filename",
+                    resp_text,
+                    fixed = TRUE))) {
+    message("Success")
   } else {
-    write("Error: did not receive message saying session was made", stderr())
+    stop("did not receive message saying session was made")
   }
 
-  all.sessions = get_GXPA_session_list()
-  cur.id = all.sessions[all.sessions$name == session_name, "id"]
-  return(cur.id)
+  all.sessions <- get_GXPA_session_list()
+  all.sessions[all.sessions$name == session_name, "id"]
 }
 
 #' Perform a Dry Run of the session (only works in GXPA version with py3)
@@ -193,58 +207,60 @@ begin_new_session <- function(session_name,
 #'
 #' @examples
 #' \dontrun{
-#' user_cookie = login_and_get_user_cookie()
-#' tmp=dry_run_session("VLZHJS", user_cookie = user_cookie)
-#' tmp=dry_run_session("8T3X5G", user_cookie = user_cookie)
-#' tmp=dry_run_session("8P9JD3", user_cookie = user_cookie)
+#' user_cookie <- login_and_get_user_cookie()
+#' tmp <- dry_run_session("VLZHJS", user_cookie = user_cookie)
+#' tmp <- dry_run_session("8T3X5G", user_cookie = user_cookie)
+#' tmp <- dry_run_session("8P9JD3", user_cookie = user_cookie)
 #' }
 #'
 dry_run_session <- function(session_id,
-                            run.type="quick",  # the other option is "full"
-                            user_cookie=login_and_get_user_cookie()) {
+                            run.type = "quick", # the other option is "full"
+                            user_cookie = login_and_get_user_cookie()) {
 
   # build the URL to access the data and get the csrf token
-  post_url = paste0("https://geneatlas.redda.celgene.com/", 'load_expr/dry_run?cur_session=', session_id)
-  resp1 = httr::GET(post_url, httr::set_cookies(sessionid=user_cookie))
-  csrf_token = get_cookie_value(resp1, "csrftoken")
+  post_url <- paste0("https://geneatlas.redda.celgene.com/", "load_expr/dry_run?cur_session=", session_id)
+  resp1 <- httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
+  csrf_token <- get_cookie_value(resp1, "csrftoken")
 
   # submit the dry run
-  resp2 = httr::POST(post_url,
-                     httr::add_headers(Referer=post_url),
-                     httr::set_cookies(sessionid=user_cookie),
-                     body = list(cur_session=session_id,
-                                 dryrun_choice=run.type,
-                                 csrfmiddlewaretoken=csrf_token))
+  resp2 <- httr::POST(post_url,
+    httr::add_headers(Referer = post_url),
+    httr::set_cookies(sessionid = user_cookie),
+    body = list(
+      cur_session = session_id,
+      dryrun_choice = run.type,
+      csrfmiddlewaretoken = csrf_token
+    )
+  )
   resp2$request
-  resp_text = httr::content(resp2, as="text")
-  resp_lines = unlist(strsplit(resp_text, "\n"))
+  resp_text <- httr::content(resp2, as = "text")
+  resp_lines <- unlist(strsplit(resp_text, "\n"))
 
-  out_start = which(grepl("<h2>Dry run:", resp_lines, fixed = T))
-  out_end = which(grepl("Resume Wizard</a></h2>", resp_lines, fixed=T))
-  resp_lines = resp_lines[out_start:out_end]
+  out_start <- which(grepl("<h2>Dry run:", resp_lines, fixed = T))
+  out_end <- which(grepl("Resume Wizard</a></h2>", resp_lines, fixed = T))
+  resp_lines <- resp_lines[out_start:out_end]
 
-  out_lines = c()
-  warn_lines = c()
-  err_lines = c()
+  out_lines <- c()
+  warn_lines <- c()
+  err_lines <- c()
   for (i in 1:length(resp_lines)) {
-    cur.line = resp_lines[i]
-    cur.line = sub("^ *", "", cur.line)  # remove leading spaces
+    cur.line <- resp_lines[i]
+    cur.line <- sub("^ *", "", cur.line) # remove leading spaces
 
-    #write(paste("checking: ", cur.line), stderr())
+    # write(paste("checking: ", cur.line), stderr())
     if (length(cur.line) == 1 & cur.line != "") {
-
       if (any(grepl("error", cur.line, ignore.case = T))) {
         write(cur.line, stderr())
-        err_lines = c(err_lines, cur.line)
+        err_lines <- c(err_lines, cur.line)
       } else if (any(grepl("warning", cur.line, ignore.case = T))) {
         write(cur.line, stderr())
-        warn_lines = c(warn_lines, cur.line)
+        warn_lines <- c(warn_lines, cur.line)
       }
-      out_lines = c(out_lines, cur.line)
+      out_lines <- c(out_lines, cur.line)
     }
   }
 
-  invisible(list(output=out_lines, warnings=warn_lines, errors=err_lines))
+  invisible(list(output = out_lines, warnings = warn_lines, errors = err_lines))
 }
 
 #' Load session data to database
@@ -273,54 +289,57 @@ dry_run_session <- function(session_id,
 #'
 #' @examples
 #' \dontrun{
-#'# This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
-#'load_session("X1NBJK", load.type="upload_new")
-#'load_session("X1NBJK", load.type="upload_new")
-#'load_session("X1NBJK", load.type="load_scores")
+#' # This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
+#' load_session("X1NBJK", load.type = "upload_new")
+#' load_session("X1NBJK", load.type = "upload_new")
+#' load_session("X1NBJK", load.type = "load_scores")
 #' }
 #'
-
 load_session <- function(session_id,
-                         load.type="upload_new",  # the other option is "update"
-                         user_cookie=login_and_get_user_cookie()) {
-
+                         load.type = "upload_new", # the other option is "update"
+                         user_cookie = login_and_get_user_cookie()) {
   if (load.type == "update_series") {
     # use this one if the series in the app has a linked session_id
-    load.type = "update_series_using_session_id_and_sample_ids"
+    load.type <- "update_series_using_session_id_and_sample_ids"
 
     # some old series don't have a session_id, so this would re-establish a link
     # load.type = "update_series_using_name_and_sample_ids"
   }
 
   # build the URL to access the data and get the csrf token
-  post_url = paste0("https://geneatlas.redda.celgene.com/", 'load_expr/', load.type ,'?cur_session=', session_id)
-  resp1 = httr::GET(post_url, httr::set_cookies(sessionid=user_cookie))
-  csrf_token = get_cookie_value(resp1, "csrftoken")
+  post_url <- paste0("https://geneatlas.redda.celgene.com/", "load_expr/", load.type, "?cur_session=", session_id)
+  resp1 <- httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
+  csrf_token <- get_cookie_value(resp1, "csrftoken")
 
-  resp1_text = httr::content(resp1, as="text")
+  resp1_text <- httr::content(resp1, as = "text")
   if (grepl("Error: This type of data loading action", resp1_text, fixed = T)) {
-    stop("Did not submit load task because that load type is not ",
-         "currently allowed given the state of the database")
+    stop(
+      "Did not submit load task because that load type is not ",
+      "currently allowed given the state of the database"
+    )
   }
 
   # submit the load command
-  resp2 = httr::POST(post_url,
-                     httr::add_headers(Referer=post_url),
-                     httr::set_cookies(sessionid=user_cookie),
-                     body = list(cur_session=session_id,
-                                 csrfmiddlewaretoken=csrf_token))
+  resp2 <- httr::POST(post_url,
+    httr::add_headers(Referer = post_url),
+    httr::set_cookies(sessionid = user_cookie),
+    body = list(
+      cur_session = session_id,
+      csrfmiddlewaretoken = csrf_token
+    )
+  )
   resp2$request
-  resp_text = httr::content(resp2, as="text")
+  resp_text <- httr::content(resp2, as = "text")
 
   if (grepl("Page not found", ignore.case = T, resp_text)) {
     stop("load.type is not an option: ", load.type)
   } else if (grepl("Error: This type of data loading action", resp_text, fixed = T)) {
     write("Error: did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ", stderr())
-  } else if (grepl("cannot permit that action:", resp_text, fixed=T)) {
+  } else if (grepl("cannot permit that action:", resp_text, fixed = T)) {
     write("Error: cannot permit that load.type action", stderr())
   } else if (grepl("Messages:.*num_inserted", resp_text)) {
     write("Success - data saved", stderr())
-  } else if (grepl("saved into task queue:", resp_text, fixed=T)) {
+  } else if (grepl("saved into task queue:", resp_text, fixed = T)) {
     write("Success - loaded into task queue", stderr())
   } else {
     write("Error: did not receive confirmation message", stderr())
@@ -340,42 +359,44 @@ load_session <- function(session_id,
 #'
 #' @examples
 #' \dontrun{
-#' out.df = get_GXPA_session_list()
-#' out.df[grepl("Blueprint", out.df$name, ignore.case=T),]
-#' session_id = out.df[grepl("blueprint", out.df$name), "id"]
+#' out.df <- get_GXPA_session_list()
+#' out.df[grepl("Blueprint", out.df$name, ignore.case = T), ]
+#' session_id <- out.df[grepl("blueprint", out.df$name), "id"]
 #' }
 get_GXPA_session_list <- function() {
-  session_url = paste0("https://geneatlas.redda.celgene.com/", "remote/api")
-  dat=get_info_from_url(session_url)
+  session_url <- paste0("https://geneatlas.redda.celgene.com/", "remote/api")
+  dat <- get_info_from_url(session_url)
   dat$user
 
-  out.df = NULL; for (cur.id in names(dat$sessions)) {
-    cur = dat$sessions[[cur.id]]
+  out.df <- NULL
+  for (cur.id in names(dat$sessions)) {
+    cur <- dat$sessions[[cur.id]]
 
     # perm is sometimes NULL and that causes as.data.frame to fail
-    if (is.null(cur$perm)) cur$perm = 0
+    if (is.null(cur$perm)) cur$perm <- 0
 
     # make sure everything works ok
     tryCatch(
       {
-        cur.df = as.data.frame(cur)
+        cur.df <- as.data.frame(cur)
       },
-      error= function(e) message(paste("Cannot convert to dataframe:", cur[[1]]))
+      error = function(e) message(paste("Cannot convert to dataframe:", cur[[1]]))
     )
-    cur.df$id = cur.id
+    cur.df$id <- cur.id
 
     if (is.null(out.df)) {
-      out.df = cur.df
+      out.df <- cur.df
     } else {
       tryCatch(
         {
-          out.df = rbind(out.df, cur.df)
+          out.df <- rbind(out.df, cur.df)
         },
-        error= function(e) message(paste("Cannot combine with previous:", cur[[1]]))
+        error = function(e) message(paste("Cannot combine with previous:", cur[[1]]))
       )
     }
   }
-  head(out.df); dim(out.df)
+  head(out.df)
+  dim(out.df)
 
   return(out.df)
 }
@@ -383,12 +404,13 @@ get_GXPA_session_list <- function() {
 
 # get_GXPA_session_details("IKAV1T")
 get_GXPA_session_details <- function(session_id) {
-  session_url = paste0("https://geneatlas.redda.celgene.com/",
-                       "remote/api?expr_details=1&dir=1&cur_session=",
-                       session_id)
-  dat=get_info_from_url(session_url)
+  session_url <- paste0(
+    "https://geneatlas.redda.celgene.com/",
+    "remote/api?expr_details=1&dir=1&cur_session=",
+    session_id
+  )
+  dat <- get_info_from_url(session_url)
   dat$user
 
   return(dat)
 }
-
