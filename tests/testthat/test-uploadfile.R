@@ -1,4 +1,4 @@
-test_that("testing various errors and success", {
+test_that("testing send_file_to_session() errors and success", {
   tmp_file <- tempfile()
   utils::write.csv(matrix(rnorm(100), nrow = 10), tmp_file)
 
@@ -47,3 +47,172 @@ test_that("testing various errors and success", {
     paste0("Successfully uploaded expr.expr.txt\\(from ", tmp_file, "\\)")
   )
 })
+
+
+test_that("testing begin_new_session() errors", {
+
+  results_plus <- purrr::quietly(
+    ~ begin_new_session(session_name = "test_GXPAinterface")
+  )()
+
+  expect_equal(
+    results_plus$result,
+    "7AR22L"
+  )
+
+  expect_equal(
+    results_plus$warnings,
+    "did not make new session since one with that name already exists, and its session_id is returned"
+  )
+
+  expect_warning(
+    begin_new_session(session_name = "abcd", user_cookie = 'bad_cookie'),
+    "did not receive message saying session was made"
+  )
+
+})
+
+
+test_that("testing dry_run() errors", {
+
+  expect_error(
+    dry_run_session("BAD_ID"),
+    "Session not found"
+  )
+
+})
+
+
+test_that("testing remove_session() errors", {
+
+  expect_warning(
+    remove_session("BAD_ID"),
+    "did not receive confirmation message"
+  )
+
+})
+
+
+test_that("testing load_session() errors", {
+
+  expect_warning(
+    load_session("BAD_ID", load_type = 'update_series'),
+    "did not receive confirmation message"
+  )
+
+  expect_error(
+    load_session("7AR22L", load_type = 'update_series'),
+    "Did not submit load task because that load type is not currently allowed given the state of the database"
+  )
+
+})
+
+
+
+test_that("testing run of begin_new_session() to remove_session()", {
+
+  results_plus <- purrr::quietly(
+    ~ begin_new_session("new_test_session")
+  )()
+
+  expect_equal(
+    results_plus$messages,
+    "Success\n"
+  )
+
+  dry_run_plus <- purrr::quietly(
+    ~ dry_run_session(results_plus$result)
+  )()
+
+  expect_equal(
+    dry_run_plus$warnings,
+    "Errors found in Dry Run (see above)"
+  )
+
+  expect_equal(
+    dry_run_plus$messages,
+    c("<li>IOERROR (series): samples file missing</li>\n",
+   "<li>IOERROR (series): series info file missing</li>\n",
+    "<li>IOERROR (series): expr file missing</li>\n",
+    "<li>IOERROR (score): samples file missing</li>\n",
+    "<li>IOERROR (score): series info file missing</li>\n",
+    "<li>IOERROR (score): expr file missing</li>\n",
+    "<li>IOERROR (score): score_info file missing</li>\n")
+  )
+
+  expect_message(
+    remove_session(results_plus$result),
+    "Success - session removed\n"
+  )
+})
+
+
+
+
+test_that("testing get_GXPA_session_list() errors and success", {
+
+  tmp_list <- get_GXPA_session_list()
+  selected_output <- as.list(tmp_list[tmp_list$id == '7AR22L', ])[-(1:2)]
+
+  expect_equal(
+    selected_output,
+    list(
+       mod_time_readable = "2022-06-21 20:06",
+      perm_reason = "user is superuser",
+      perm = "61",
+      type = "expr",
+      name = "test_GXPAinterface",
+      id = "7AR22L"
+    )
+  )
+
+  # only public data shows if bad token given
+  public_list <- get_GXPA_session_list(GXPA_TOKEN = 'Bad_Token')
+  selected_public_output <- as.list(
+    public_list[public_list$id == 'AQUKTU', ])[-(1:2)]
+
+  expect_false(any(public_list$id == '7AR22L'))
+  expect_equal(
+    selected_public_output,
+    list(
+      mod_time_readable = "2019-07-24 17:07",
+      perm_reason = "no perm set for session",
+      perm = "0",
+      type = "GEO",
+      name = "GSE28490",
+      id = "AQUKTU"
+    )
+  )
+
+
+})
+
+
+test_that("testing get_GXPA_session_details() success", {
+
+  tmp_output <- get_GXPA_session_details('7AR22L')
+  # order of registered files sometimes off
+  tmp_output$registered_files <- sort(tmp_output$registered_files)
+
+  expect_equal(
+    tmp_output,
+    list(
+      help = ", Use 'dir=1' to see all registered files; 'list_file_types=csv' to list all registered files of certain file types;'expr_details=1' to look up series info, number of samples & features, etc for expr related sessions;",
+      session_type = "expr",
+      cur_step = "base_ready",
+      cur_session = "7AR22L",
+      user = list(name = "fulpw", id = 61L),
+      registered_files = c("cur_step.txt", "expr.expr.txt",
+                           "expr.series_info.csv", "session_info.txt"),
+      session_name = "test_GXPAinterface",
+      details = list(series_descript = "Long description",
+                     num_genes = "11",
+                     series_name = "SU2C_2019",
+                     num_annots = NULL,
+                     num_samples = "1")
+    )
+  )
+
+
+})
+

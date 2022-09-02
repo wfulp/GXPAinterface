@@ -1,31 +1,26 @@
 Package: GXPAinterface
 Title: Access the GXPA API and Pre-process Data for GXPA
 Version: 0.1.0
-Authors@R: 
-  c(
-    person(given = "Jimmy",
-           family = "Fulp",
-           role = c("aut", "cre"),
-           email = "william.fulp@bms.com",
-           comment = c(ORCID = "0000-0001-6888-0794")
-    ),
-    person(given = "Brian",
-           family = "Fox",
-           role = c("aut"),
-           email = "brian.fox@bms.com",
-           comment = c(ORCID = "0000-0001-6620-3853")
-           )
+Authors@R: c(
+    person("Jimmy", "Fulp", , "william.fulp@bms.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-6888-0794")),
+    person("Brian", "Fox", , "brian.fox@bms.com", role = "aut",
+           comment = c(ORCID = "0000-0001-6620-3853"))
   )
-Description: Various functions to access the GXPA API and another collection of functions to pre-process the data for importing into GXPA.
+Description: Various functions to access the GXPA API and another
+    collection of functions to pre-process the data for importing into
+    GXPA.
 License: MIT + file LICENSE
+URL: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface
+BugReports: 
+    https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/issues
+Imports:
+    httr,
+    jsonlite
 Suggests: 
+    purrr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
-URL: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface
-BugReports: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/issues
-Imports:
-  httr,
-  jsonlite
+RoxygenNote: 7.2.1
