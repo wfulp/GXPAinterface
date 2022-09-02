@@ -6,14 +6,14 @@
 \usage{
 load_session(
   session_id,
-  load.type = "upload_new",
+  load_type = c("upload_new", "update_series", "add_new_scores", "load_coords"),
   user_cookie = login_and_get_user_cookie()
 )
 }
 \arguments{
 \item{session_id}{Required: the id of session}
 
-\item{load.type}{Default 'upload_new'. See description above for more choices.}
+\item{load_type}{Default 'upload_new'. See description above for more choices.}
 
 \item{user_cookie}{Optional: the cookie string. Can use
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
@@ -27,21 +27,21 @@ case you didn't get a success message.
 \description{
 Run the remote function to upload data from the session to the
 app database. If this session has not been loaded to the database, then
-\code{load.type} must be \code{upload_new} which is the default. On the other hand, if
+\code{load_type} must be \code{upload_new} which is the default. On the other hand, if
 this session is already matched to one in the database, then several other
-choices for \code{load.type} are available: \code{update_series} \code{add_new_scores} and
+choices for \code{load_type} are available: \code{update_series} \code{add_new_scores} and
 \code{load_coords}. For more information on these options, go to the Load Data
 page on the app.
 
-A message will be shown in red (printed to stderr) to say if the task
-submission was successul or if there was a problem.
+A message will be shown to say if the task
+submission was successful or error message if there was a problem.
 }
 \examples{
 \dontrun{
 # This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
-load_session("X1NBJK", load.type = "upload_new")
-load_session("X1NBJK", load.type = "upload_new")
-load_session("X1NBJK", load.type = "load_scores")
+load_session("X1NBJK", load_type = "upload_new")
+load_session("X1NBJK", load_type = "upload_new")
+load_session("X1NBJK", load_type = "load_scores")
 }
 
 }

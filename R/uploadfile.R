@@ -245,9 +245,9 @@ dry_run_session <- function(session_id,
   err_lines <- c()
   for (i in 1:length(resp_lines)) {
     cur.line <- resp_lines[i]
-    cur.line <- sub("^ *", "", cur.line) # remove leading spaces
+    # remove leading spaces
+    cur.line <- sub("^ *", "", cur.line)
 
-    # write(paste("checking: ", cur.line), stderr())
     if (length(cur.line) == 1 & cur.line != "") {
       if (any(grepl("error", cur.line, ignore.case = T))) {
         write(cur.line, stderr())
@@ -267,17 +267,17 @@ dry_run_session <- function(session_id,
 #'
 #' @description Run the remote function to upload data from the session to the
 #' app database. If this session has not been loaded to the database, then
-#' `load.type` must be `upload_new` which is the default. On the other hand, if
+#' `load_type` must be `upload_new` which is the default. On the other hand, if
 #' this session is already matched to one in the database, then several other
-#' choices for `load.type` are available: `update_series` `add_new_scores` and
+#' choices for `load_type` are available: `update_series` `add_new_scores` and
 #' `load_coords`. For more information on these options, go to the Load Data
 #' page on the app.
 #'
-#' A message will be shown in red (printed to stderr) to say if the task
-#' submission was successul or if there was a problem.
+#' A message will be shown to say if the task
+#' submission was successful or error message if there was a problem.
 #'
 #' @param session_id Required: the id of session
-#' @param load.type Default 'upload_new'. See description above for more choices.
+#' @param load_type Default 'upload_new'. See description above for more choices.
 #' @param user_cookie Optional: the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
@@ -290,25 +290,30 @@ dry_run_session <- function(session_id,
 #' @examples
 #' \dontrun{
 #' # This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
-#' load_session("X1NBJK", load.type = "upload_new")
-#' load_session("X1NBJK", load.type = "upload_new")
-#' load_session("X1NBJK", load.type = "load_scores")
+#' load_session("X1NBJK", load_type = "upload_new")
+#' load_session("X1NBJK", load_type = "upload_new")
+#' load_session("X1NBJK", load_type = "load_scores")
 #' }
 #'
 load_session <- function(session_id,
-                         load.type = "upload_new", # the other option is "update"
+                         load_type = c("upload_new",
+                                       "update_series",
+                                       "add_new_scores",
+                                       "load_coords"),
                          user_cookie = login_and_get_user_cookie()) {
-  if (load.type == "update_series") {
+  load_type <- match.arg(load_type)
+
+  if (load_type == "update_series") {
     # use this one if the series in the app has a linked session_id
-    load.type <- "update_series_using_session_id_and_sample_ids"
+    load_type <- "update_series_using_session_id_and_sample_ids"
 
     # some old series don't have a session_id, so this would re-establish a link
-    # load.type = "update_series_using_name_and_sample_ids"
+    # load_type = "update_series_using_name_and_sample_ids"
   }
 
   # build the URL to access the data and get the csrf token
   post_url <- paste0("https://geneatlas.redda.celgene.com/", "load_expr/",
-                     load.type, "?cur_session=", session_id)
+                     load_type, "?cur_session=", session_id)
   resp1 <- httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
   csrf_token <- get_cookie_value(resp1, "csrftoken")
 
@@ -334,18 +339,78 @@ load_session <- function(session_id,
   resp_text <- httr::content(resp2, as = "text")
 
   if (grepl("Page not found", ignore.case = TRUE, resp_text)) {
-    stop("load.type is not an option: ", load.type)
+    stop("load_type is not an option: ", load_type)
   } else if (grepl("Error: This type of data loading action",
                    resp_text, fixed = TRUE)) {
-    message("Error: did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ")
+    stop("did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ")
   } else if (grepl("cannot permit that action:", resp_text, fixed = TRUE)) {
-    message("Error: cannot permit that load.type action")
+    stop("cannot permit that load_type action")
   } else if (grepl("Messages:.*num_inserted", resp_text)) {
     message("Success - data saved")
   } else if (grepl("saved into task queue:", resp_text, fixed = TRUE)) {
     message("Success - loaded into task queue")
   } else {
-    message("Error: did not receive confirmation message")
+    stop("did not receive confirmation message")
+  }
+  invisible(resp_text)
+}
+
+#' Remove session directory
+#'
+#' @description Remove a session directory. This is permanent. It will fail
+#' if the session is linked to a series. To unlink a session and a series,
+#' you need to use the web interface to delete the series. Then you can remove
+#' the session directory.
+#'
+#' @param session_id Required: the id of session
+#' @param user_cookie Optional: the cookie string. Can use
+#'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
+#'      string, then the function will run login_and_get_user_cookie(). So, if
+#'      you provide the cookie then it saves one interaction with the server.
+#'
+#' @return Invisibly returns the full html output which can be useful in
+#' case you didn't get a success message.
+#' @export
+#'
+#' @seealso [begin_new_session()], [send_file_to_session()],
+#'     [dry_run_session()], [load_session()],
+#'     [remove_session()]
+#'
+#' @examples
+#' \dontrun{
+#' user_cookie = login_and_get_user_cookie()
+#' sess_id = begin_new_session("new_test_session", user_cookie=user_cookie)
+#' remove_session(sess_id)
+#' }
+#'
+
+remove_session <- function(session_id,
+                           user_cookie = login_and_get_user_cookie()) {
+
+  # build the URL to access the data and get the csrf token
+  post_url = paste0(
+    'https://geneatlas.redda.celgene.com/sessions/remove_session?cur_session=',
+    session_id)
+  resp1 = httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
+  csrf_token = get_cookie_value(resp1, "csrftoken")
+  resp1_text = httr::content(resp1, as = "text")
+
+  if (grepl("Error: Removal of session is not allowed", resp1_text, fixed = T)) {
+    stop("Removal of session is not allowed")
+  }
+
+  # submit the load command
+  resp2 = httr::POST(post_url,
+                     httr::add_headers(Referer = post_url),
+                     httr::set_cookies(sessionid = user_cookie),
+                     body = list(cur_session = session_id,
+                                 csrfmiddlewaretoken = csrf_token))
+  resp_text = httr::content(resp2, as = "text")
+
+  if (grepl("Messages:.*Successfully removed session", resp_text)) {
+    message("Success - session removed")
+  } else {
+    stop("did not receive confirmation message")
   }
   invisible(resp_text)
 }

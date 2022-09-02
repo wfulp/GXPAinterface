@@ -49,7 +49,7 @@ test_that("testing send_file_to_session() errors and success", {
 })
 
 
-test_that("testing begin_new_session() errors and success", {
+test_that("testing begin_new_session() errors", {
 
   expect_equal(
     suppressWarnings(
@@ -67,6 +67,46 @@ test_that("testing begin_new_session() errors and success", {
   )
 
 })
+
+
+test_that("testing remove_session() errors", {
+
+  expect_error(
+    remove_session("BAD_ID"),
+    "did not receive confirmation message"
+  )
+
+})
+
+
+test_that("testing load_session() errors", {
+
+  expect_error(
+    load_session("BAD_ID", load_type = 'update_series'),
+    "did not receive confirmation message"
+  )
+
+})
+
+
+
+test_that("testing run of begin_new_session(), load_session(), remove_session()", {
+
+  results_plus <- purrr::quietly(
+    ~ begin_new_session("new_test_session")
+  )()
+
+  expect_equal(
+    results_plus$messages,
+    "Success\n"
+  )
+
+  expect_message(
+    remove_session(results_plus$result),
+    "Success - session removed\n"
+  )
+})
+
 
 
 
@@ -112,6 +152,8 @@ test_that("testing get_GXPA_session_list() errors and success", {
 test_that("testing get_GXPA_session_details() success", {
 
   tmp_output <- get_GXPA_session_details('7AR22L')
+  # order of registered files sometimes off
+  tmp_output$registered_files <- sort(tmp_output$registered_files)
 
   expect_equal(
     tmp_output,
