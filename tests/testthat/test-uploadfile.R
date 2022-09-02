@@ -51,17 +51,21 @@ test_that("testing send_file_to_session() errors and success", {
 
 test_that("testing begin_new_session() errors", {
 
+  results_plus <- purrr::quietly(
+    ~ begin_new_session(session_name = "test_GXPAinterface")
+  )()
+
   expect_equal(
-    suppressWarnings(
-      begin_new_session(session_name = "test_GXPAinterface")),
+    results_plus$result,
     "7AR22L"
   )
-  expect_warning(
-    begin_new_session(session_name = "test_GXPAinterface"),
+
+  expect_equal(
+    results_plus$warnings,
     "did not make new session since one with that name already exists, and its session_id is returned"
   )
 
-  expect_error(
+  expect_warning(
     begin_new_session(session_name = "abcd", user_cookie = 'bad_cookie'),
     "did not receive message saying session was made"
   )
@@ -69,9 +73,19 @@ test_that("testing begin_new_session() errors", {
 })
 
 
-test_that("testing remove_session() errors", {
+test_that("testing dry_run() errors", {
 
   expect_error(
+    dry_run_session("BAD_ID"),
+    "Session not found"
+  )
+
+})
+
+
+test_that("testing remove_session() errors", {
+
+  expect_warning(
     remove_session("BAD_ID"),
     "did not receive confirmation message"
   )
@@ -81,16 +95,21 @@ test_that("testing remove_session() errors", {
 
 test_that("testing load_session() errors", {
 
-  expect_error(
+  expect_warning(
     load_session("BAD_ID", load_type = 'update_series'),
     "did not receive confirmation message"
+  )
+
+  expect_error(
+    load_session("7AR22L", load_type = 'update_series'),
+    "Did not submit load task because that load type is not currently allowed given the state of the database"
   )
 
 })
 
 
 
-test_that("testing run of begin_new_session(), load_session(), remove_session()", {
+test_that("testing run of begin_new_session() to remove_session()", {
 
   results_plus <- purrr::quietly(
     ~ begin_new_session("new_test_session")
@@ -99,6 +118,26 @@ test_that("testing run of begin_new_session(), load_session(), remove_session()"
   expect_equal(
     results_plus$messages,
     "Success\n"
+  )
+
+  dry_run_plus <- purrr::quietly(
+    ~ dry_run_session(results_plus$result)
+  )()
+
+  expect_equal(
+    dry_run_plus$warnings,
+    "Errors found in Dry Run (see above)"
+  )
+
+  expect_equal(
+    dry_run_plus$messages,
+    c("<li>IOERROR (series): samples file missing</li>\n",
+   "<li>IOERROR (series): series info file missing</li>\n",
+    "<li>IOERROR (series): expr file missing</li>\n",
+    "<li>IOERROR (score): samples file missing</li>\n",
+    "<li>IOERROR (score): series info file missing</li>\n",
+    "<li>IOERROR (score): expr file missing</li>\n",
+    "<li>IOERROR (score): score_info file missing</li>\n")
   )
 
   expect_message(

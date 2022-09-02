@@ -109,7 +109,8 @@ send_file_to_session <- function(session_id,
 #'      you provide the cookie then it saves one interaction with the server.
 #'
 #' @return If successful, the session ID (6 characters) will be returned, and
-#'      it can be used for other session functions
+#'      it can be used for other session functions. If unsuccessful returns
+#'      the full html output which can be useful for debugging
 #' @export
 #'
 #' @seealso [dry_run_session()], [load_session()]
@@ -153,7 +154,8 @@ begin_new_session <- function(
            " is not one of the available choices"),
     resp_text
   )) {
-    stop(paste0("session_type is not allowed: ", session_type))
+    warning(paste0("session_type is not allowed: ", session_type))
+    return(resp_text)
   }
 
   if (grepl(paste0("Name [",
@@ -173,7 +175,8 @@ begin_new_session <- function(
                     fixed = TRUE))) {
     message("Success")
   } else {
-    stop("did not receive message saying session was made")
+    warning("did not receive message saying session was made")
+    return(resp_text)
   }
 
   all.sessions <- get_GXPA_session_list()
@@ -194,7 +197,7 @@ begin_new_session <- function(
 #'    into the app database.
 #'
 #' @param session_id Required: the id of session
-#' @param run.type Default 'quick' another choice is 'full' which takes longer
+#' @param run_type Default 'quick' another choice is 'full' which takes longer
 #'    since it checks all the lines of the expression matrix
 #' @param user_cookie Optional: the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
@@ -214,11 +217,13 @@ begin_new_session <- function(
 #' }
 #'
 dry_run_session <- function(session_id,
-                            run.type = "quick", # the other option is "full"
+                            run_type = c("quick", "full"),
                             user_cookie = login_and_get_user_cookie()) {
+  run_type <- match.arg(run_type)
 
   # build the URL to access the data and get the csrf token
-  post_url <- paste0("https://geneatlas.redda.celgene.com/", "load_expr/dry_run?cur_session=", session_id)
+  post_url <- paste0("https://geneatlas.redda.celgene.com/",
+                     "load_expr/dry_run?cur_session=", session_id)
   resp1 <- httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
   csrf_token <- get_cookie_value(resp1, "csrftoken")
 
@@ -228,12 +233,15 @@ dry_run_session <- function(session_id,
     httr::set_cookies(sessionid = user_cookie),
     body = list(
       cur_session = session_id,
-      dryrun_choice = run.type,
+      dryrun_choice = run_type,
       csrfmiddlewaretoken = csrf_token
     )
   )
-  resp2$request
+
   resp_text <- httr::content(resp2, as = "text")
+  if (grepl('not found in visible choices', resp_text)) {
+    stop('Session not found')
+  }
   resp_lines <- unlist(strsplit(resp_text, "\n"))
 
   out_start <- which(grepl("<h2>Dry run:", resp_lines, fixed = T))
@@ -250,14 +258,23 @@ dry_run_session <- function(session_id,
 
     if (length(cur.line) == 1 & cur.line != "") {
       if (any(grepl("error", cur.line, ignore.case = T))) {
-        write(cur.line, stderr())
+        message(cur.line)
         err_lines <- c(err_lines, cur.line)
       } else if (any(grepl("warning", cur.line, ignore.case = T))) {
-        write(cur.line, stderr())
+        message(cur.line)
         warn_lines <- c(warn_lines, cur.line)
       }
       out_lines <- c(out_lines, cur.line)
     }
+  }
+  if (length(err_lines) > 0) {
+    warning('Errors found in Dry Run (see above)')
+  }
+  if (length(warn_lines) > 0) {
+    warning('Warnings found in Dry Run (see above)')
+  }
+  if (length(err_lines) == 0 && length(warn_lines) == 0) {
+    message('No errors or warnings found in Dry Run')
   }
 
   invisible(list(output = out_lines, warnings = warn_lines, errors = err_lines))
@@ -339,18 +356,18 @@ load_session <- function(session_id,
   resp_text <- httr::content(resp2, as = "text")
 
   if (grepl("Page not found", ignore.case = TRUE, resp_text)) {
-    stop("load_type is not an option: ", load_type)
+    warning("load_type is not an option: ", load_type)
   } else if (grepl("Error: This type of data loading action",
                    resp_text, fixed = TRUE)) {
-    stop("did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ")
+    warning("did not submit load task because that load type is not currently allowed given the state of the database [from POST page] ")
   } else if (grepl("cannot permit that action:", resp_text, fixed = TRUE)) {
-    stop("cannot permit that load_type action")
+    warning("cannot permit that load_type action")
   } else if (grepl("Messages:.*num_inserted", resp_text)) {
     message("Success - data saved")
   } else if (grepl("saved into task queue:", resp_text, fixed = TRUE)) {
     message("Success - loaded into task queue")
   } else {
-    stop("did not receive confirmation message")
+    warning("did not receive confirmation message")
   }
   invisible(resp_text)
 }
@@ -410,7 +427,7 @@ remove_session <- function(session_id,
   if (grepl("Messages:.*Successfully removed session", resp_text)) {
     message("Success - session removed")
   } else {
-    stop("did not receive confirmation message")
+    warning("did not receive confirmation message")
   }
   invisible(resp_text)
 }

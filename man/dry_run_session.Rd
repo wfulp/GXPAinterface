@@ -6,14 +6,14 @@
 \usage{
 dry_run_session(
   session_id,
-  run.type = "quick",
+  run_type = c("quick", "full"),
   user_cookie = login_and_get_user_cookie()
 )
 }
 \arguments{
 \item{session_id}{Required: the id of session}
 
-\item{run.type}{Default 'quick' another choice is 'full' which takes longer
+\item{run_type}{Default 'quick' another choice is 'full' which takes longer
 since it checks all the lines of the expression matrix}
 
 \item{user_cookie}{Optional: the cookie string. Can use

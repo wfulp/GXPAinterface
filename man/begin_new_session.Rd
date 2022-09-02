@@ -24,7 +24,8 @@ you provide the cookie then it saves one interaction with the server.}
 }
 \value{
 If successful, the session ID (6 characters) will be returned, and
-it can be used for other session functions
+it can be used for other session functions. If unsuccessful returns
+the full html output which can be useful for debugging
 }
 \description{
 This will use the form on the app located at the URL path of
