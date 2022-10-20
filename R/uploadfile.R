@@ -183,7 +183,7 @@ begin_new_session <- function(
   all.sessions[all.sessions$name == session_name, "id"]
 }
 
-#' Perform a Dry Run of the session (only works in GXPA version with py3)
+#' Perform a Dry Run of the session
 #'
 #' @description This function will trigger the app to execute a dry run of
 #'    loading the session data to the database. If you assign the output to
@@ -198,7 +198,9 @@ begin_new_session <- function(
 #'
 #' @param session_id Required: the id of session
 #' @param run_type Default 'quick' another choice is 'full' which takes longer
-#'    since it checks all the lines of the expression matrix
+#'    since it checks all the lines of the expression matrix (this option is
+#'    only supported and functional in GXPA version with py3 - otherwise it
+#'    will just do a full dry run)
 #' @param user_cookie Optional: the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
@@ -208,12 +210,14 @@ begin_new_session <- function(
 #'     output of the dry run. $errors has any errors,
 #'     and $warnings has any warnings
 #'
+#' @export
 #' @examples
 #' \dontrun{
 #' user_cookie <- login_and_get_user_cookie()
 #' tmp <- dry_run_session("VLZHJS", user_cookie = user_cookie)
 #' tmp <- dry_run_session("8T3X5G", user_cookie = user_cookie)
 #' tmp <- dry_run_session("8P9JD3", user_cookie = user_cookie)
+#' tmp <- dry_run_session("X1NBJK", user_cookie = user_cookie)
 #' }
 #'
 dry_run_session <- function(session_id,
@@ -307,7 +311,6 @@ dry_run_session <- function(session_id,
 #' @examples
 #' \dontrun{
 #' # This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
-#' load_session("X1NBJK", load_type = "upload_new")
 #' load_session("X1NBJK", load_type = "upload_new")
 #' load_session("X1NBJK", load_type = "load_scores")
 #' }
@@ -426,6 +429,72 @@ remove_session <- function(session_id,
 
   if (grepl("Messages:.*Successfully removed session", resp_text)) {
     message("Success - session removed")
+  } else {
+    warning("did not receive confirmation message")
+  }
+  invisible(resp_text)
+}
+
+
+#' Remove series from database
+#'
+#' @description Remove a series from the database. This is permanent. It will fail
+#' if the series has other user content or is linked to other series via super_series.
+#' It is better to try and remove the series from the app since in the future I
+#' will add extra information for if it fails. So, this function is mostly
+#' useful in case you are developing some scripts to automate loading data and
+#' want to temporarily load a series and then remove it.
+#'
+#' @param series_id Required: the id of the series you want to delete.
+#' @param user_cookie Optional: the cookie string. Can use
+#'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
+#'      string, then the function will run login_and_get_user_cookie(). So, if
+#'      you provide the cookie then it saves one interaction with the server.
+#'
+#' @return Invisibly returns the full html output which can be useful in
+#' case you didn't get a success message.
+#' @export
+#'
+#' @seealso [load_session()]
+#'
+#' @examples
+#' \dontrun{
+#' user_cookie = login_and_get_user_cookie()
+#' tmp <- dry_run_session("X1NBJK", user_cookie = user_cookie)
+#' load_session("X1NBJK", load_type = "upload_new")
+#'
+#' # might have to try this line a couple times until the task is finished
+#' all_dat <- get_series_info_from_gxpa()
+#' any(all_dat$name == "GSE00001 : TEST")
+#' series_id = all_dat$id[all_dat$name == "GSE00001 : TEST"]
+#' resp_page = remove_series(series_id, user_cookie)
+#' }
+#'
+
+remove_series <- function(series_id,
+                          user_cookie = login_and_get_user_cookie()) {
+
+  # build the URL to access the data and get the csrf token
+  post_url = 'https://geneatlas.redda.celgene.com/delete_data/delete_series'
+  resp1 = httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
+  csrf_token = get_cookie_value(resp1, "csrftoken")
+  resp1_text = httr::content(resp1, as = "text")
+
+  if (grepl("Error: Removal of series is not allowed", resp1_text, fixed = T)) {
+    stop("Removal of series is not allowed")
+  }
+
+  # submit the load command
+  resp2 = httr::POST(post_url,
+                     httr::add_headers(Referer = post_url),
+                     httr::set_cookies(sessionid = user_cookie),
+                     body = list(cur_series = series_id,
+                                 confirm = "1",
+                                 csrfmiddlewaretoken = csrf_token))
+  resp_text = httr::content(resp2, as = "text")
+
+  if (grepl("Messages:.*Series Deleted", resp_text)) {
+    message("Success - series removed")
   } else {
     warning("did not receive confirmation message")
   }
