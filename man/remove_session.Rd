@@ -7,9 +7,9 @@
 remove_session(session_id, user_cookie = login_and_get_user_cookie())
 }
 \arguments{
-\item{session_id}{Required: the id of session}
+\item{session_id}{the id of session}
 
-\item{user_cookie}{Optional: the cookie string. Can use
+\item{user_cookie}{the cookie string. Can use
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}

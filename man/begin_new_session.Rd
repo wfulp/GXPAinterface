@@ -11,7 +11,7 @@ begin_new_session(
 )
 }
 \arguments{
-\item{session_name}{Required: the name of the new session in the app
+\item{session_name}{the name of the new session in the app
 (letters, numbers and underscores only)}
 
 \item{session_type}{The type of session to begin: expr (default), GEO,

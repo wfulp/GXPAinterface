@@ -11,11 +11,11 @@ load_session(
 )
 }
 \arguments{
-\item{session_id}{Required: the id of session}
+\item{session_id}{the id of session}
 
 \item{load_type}{Default 'upload_new'. See description above for more choices.}
 
-\item{user_cookie}{Optional: the cookie string. Can use
+\item{user_cookie}{the cookie string. Can use
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
@@ -39,7 +39,6 @@ submission was successful or error message if there was a problem.
 \examples{
 \dontrun{
 # This session (X1NBJK) on the demo app has fake data and is tiny and easy to test
-load_session("X1NBJK", load_type = "upload_new")
 load_session("X1NBJK", load_type = "upload_new")
 load_session("X1NBJK", load_type = "load_scores")
 }
