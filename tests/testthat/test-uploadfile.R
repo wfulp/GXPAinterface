@@ -83,6 +83,15 @@ test_that("testing dry_run() errors", {
 })
 
 
+test_that("testing dry_run() success", {
+
+  expect_message(
+    dry_run_session("70FO1W"),
+    "No errors or warnings found in Dry Run"
+  )
+
+})
+
 test_that("testing remove_session() errors", {
 
   expect_warning(
