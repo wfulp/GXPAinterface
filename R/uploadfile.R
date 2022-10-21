@@ -99,7 +99,7 @@ send_file_to_session <- function(session_id,
 #'      you can run [load_session()] in order to trigger a task on the app
 #'      which loads the data from the session and into the app database.
 #'
-#' @param session_name Required: the name of the new session in the app
+#' @param session_name the name of the new session in the app
 #'      (letters, numbers and underscores only)
 #' @param session_type The type of session to begin: expr (default), GEO,
 #' features, extract, analysis
@@ -196,12 +196,12 @@ begin_new_session <- function(
 #'    to trigger a task on the app which loads the data from the session and
 #'    into the app database.
 #'
-#' @param session_id Required: the id of session
+#' @param session_id the id of session
 #' @param run_type Default 'quick' another choice is 'full' which takes longer
 #'    since it checks all the lines of the expression matrix (this option is
 #'    only supported and functional in GXPA version with py3 - otherwise it
 #'    will just do a full dry run)
-#' @param user_cookie Optional: the cookie string. Can use
+#' @param user_cookie the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
@@ -297,9 +297,9 @@ dry_run_session <- function(session_id,
 #' A message will be shown to say if the task
 #' submission was successful or error message if there was a problem.
 #'
-#' @param session_id Required: the id of session
+#' @param session_id the id of session
 #' @param load_type Default 'upload_new'. See description above for more choices.
-#' @param user_cookie Optional: the cookie string. Can use
+#' @param user_cookie the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
@@ -382,8 +382,8 @@ load_session <- function(session_id,
 #' you need to use the web interface to delete the series. Then you can remove
 #' the session directory.
 #'
-#' @param session_id Required: the id of session
-#' @param user_cookie Optional: the cookie string. Can use
+#' @param session_id the id of session
+#' @param user_cookie the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
@@ -445,15 +445,14 @@ remove_session <- function(session_id,
 #' useful in case you are developing some scripts to automate loading data and
 #' want to temporarily load a series and then remove it.
 #'
-#' @param series_id Required: the id of the series you want to delete.
-#' @param user_cookie Optional: the cookie string. Can use
+#' @param series_id the id of the series you want to delete.
+#' @param user_cookie the cookie string. Can use
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
 #'
 #' @return Invisibly returns the full html output which can be useful in
 #' case you didn't get a success message.
-#' @export
 #'
 #' @seealso [load_session()]
 #'

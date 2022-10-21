@@ -2,7 +2,7 @@
 % Please edit documentation in R/uploadfile.R
 \name{dry_run_session}
 \alias{dry_run_session}
-\title{Perform a Dry Run of the session (only works in GXPA version with py3)}
+\title{Perform a Dry Run of the session}
 \usage{
 dry_run_session(
   session_id,
@@ -11,12 +11,14 @@ dry_run_session(
 )
 }
 \arguments{
-\item{session_id}{Required: the id of session}
+\item{session_id}{the id of session}
 
 \item{run_type}{Default 'quick' another choice is 'full' which takes longer
-since it checks all the lines of the expression matrix}
+since it checks all the lines of the expression matrix (this option is
+only supported and functional in GXPA version with py3 - otherwise it
+will just do a full dry run)}
 
-\item{user_cookie}{Optional: the cookie string. Can use
+\item{user_cookie}{the cookie string. Can use
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
@@ -44,6 +46,7 @@ user_cookie <- login_and_get_user_cookie()
 tmp <- dry_run_session("VLZHJS", user_cookie = user_cookie)
 tmp <- dry_run_session("8T3X5G", user_cookie = user_cookie)
 tmp <- dry_run_session("8P9JD3", user_cookie = user_cookie)
+tmp <- dry_run_session("X1NBJK", user_cookie = user_cookie)
 }
 
 }

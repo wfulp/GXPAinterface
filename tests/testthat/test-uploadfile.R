@@ -5,7 +5,7 @@ test_that("testing send_file_to_session() errors and success", {
   # testing bad params throwing expected errors
   expect_error(
     send_file_to_session(
-      session_id = "7AR22L",
+      session_id = "083UNV",
       filename_local = "Bad_Name.txt",
       file_save_name = "expr.expr.txt"
     ),
@@ -21,7 +21,7 @@ test_that("testing send_file_to_session() errors and success", {
   )
   expect_error(
     send_file_to_session(
-      session_id = "7AR22L",
+      session_id = "083UNV",
       filename_local = tmp_file,
       file_save_name = "Bed_Output_Name.txt"
     ),
@@ -29,7 +29,7 @@ test_that("testing send_file_to_session() errors and success", {
   )
   expect_error(
     send_file_to_session(
-      session_id = "7AR22L",
+      session_id = "083UNV",
       filename_local = tmp_file,
       file_save_name = "expr.expr.txt",
       user_cookie = "BAD_COOKIE"
@@ -40,7 +40,7 @@ test_that("testing send_file_to_session() errors and success", {
   # success
   expect_message(
     send_file_to_session(
-      session_id = "7AR22L",
+      session_id = "083UNV",
       filename_local = tmp_file,
       file_save_name = "expr.expr.txt"
     ),
@@ -52,12 +52,12 @@ test_that("testing send_file_to_session() errors and success", {
 test_that("testing begin_new_session() errors", {
 
   results_plus <- purrr::quietly(
-    ~ begin_new_session(session_name = "test_GXPAinterface")
+    ~ begin_new_session(session_name = "test_GXPAinterface2")
   )()
 
   expect_equal(
     results_plus$result,
-    "7AR22L"
+    "083UNV"
   )
 
   expect_equal(
@@ -101,7 +101,7 @@ test_that("testing load_session() errors", {
   )
 
   expect_error(
-    load_session("7AR22L", load_type = 'update_series'),
+    load_session("083UNV", load_type = 'update_series'),
     "Did not submit load task because that load type is not currently allowed given the state of the database"
   )
 
@@ -149,20 +149,49 @@ test_that("testing run of begin_new_session() to remove_session()", {
 
 
 
+
+
+test_that("testing loading and deleting series", {
+  expect_warning(remove_series('aaaa'),
+                 'did not receive confirmation message'
+  )
+
+  # Need to remove test series if it exists
+  all_dat <- get_series_info_from_gxpa()
+  if (any(all_dat$name == 'test_GXPAinterface')) {
+    test_series_id <- all_dat$id[all_dat$name == 'test_GXPAinterface']
+    suppressMessages(remove_series(test_series_id))
+    Sys.sleep(10)
+  }
+
+  expect_message(load_session("70FO1W"),
+                 "Success - loaded into task queue")
+
+  Sys.sleep(10)
+
+  all_dat <- get_series_info_from_gxpa()
+  test_series_id <- all_dat$id[all_dat$name == 'test_GXPAinterface']
+  expect_message(remove_series(test_series_id),
+                 "Success - series removed")
+})
+
+
+
+
 test_that("testing get_GXPA_session_list() errors and success", {
 
   tmp_list <- get_GXPA_session_list()
-  selected_output <- as.list(tmp_list[tmp_list$id == '7AR22L', ])[-(1:2)]
+  selected_output <- as.list(tmp_list[tmp_list$id == '70FO1W', ])[-(1:2)]
 
   expect_equal(
     selected_output,
     list(
-       mod_time_readable = "2022-06-21 20:06",
+      mod_time_readable = "2022-10-21 17:10",
       perm_reason = "user is superuser",
       perm = "61",
       type = "expr",
-      name = "test_GXPAinterface",
-      id = "7AR22L"
+      name = "test_GXPAinterface3",
+      id = "70FO1W"
     )
   )
 
@@ -171,7 +200,7 @@ test_that("testing get_GXPA_session_list() errors and success", {
   selected_public_output <- as.list(
     public_list[public_list$id == 'AQUKTU', ])[-(1:2)]
 
-  expect_false(any(public_list$id == '7AR22L'))
+  expect_false(any(public_list$id == '70FO1W'))
   expect_equal(
     selected_public_output,
     list(
@@ -190,26 +219,29 @@ test_that("testing get_GXPA_session_list() errors and success", {
 
 test_that("testing get_GXPA_session_details() success", {
 
-  tmp_output <- get_GXPA_session_details('7AR22L')
-  # order of registered files sometimes off
-  tmp_output$registered_files <- sort(tmp_output$registered_files)
+  tmp_output <- get_GXPA_session_details('70FO1W')
+  expect_true(
+    all(c("expr.samples.csv",
+          "expr.expr.txt",
+          "expr.series_info.csv",
+          "session_info.txt") %in%
+          tmp_output$registered_files))
 
   expect_equal(
-    tmp_output,
+    tmp_output[-6],
     list(
       help = ", Use 'dir=1' to see all registered files; 'list_file_types=csv' to list all registered files of certain file types;'expr_details=1' to look up series info, number of samples & features, etc for expr related sessions;",
       session_type = "expr",
-      cur_step = "base_ready",
-      cur_session = "7AR22L",
+      # should be task finished based on previous delete session test
+      cur_step = "task_finished",
+      cur_session = "70FO1W",
       user = list(name = "fulpw", id = 61L),
-      registered_files = c("cur_step.txt", "expr.expr.txt",
-                           "expr.series_info.csv", "session_info.txt"),
-      session_name = "test_GXPAinterface",
+      session_name = "test_GXPAinterface3",
       details = list(series_descript = "Long description",
-                     num_genes = "11",
-                     series_name = "SU2C_2019",
-                     num_annots = NULL,
-                     num_samples = "1")
+                     num_genes = "101",
+                     series_name = "test_GXPAinterface",
+                     num_annots = "5",
+                     num_samples = "28")
     )
   )
 
