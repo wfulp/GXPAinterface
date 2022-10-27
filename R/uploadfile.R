@@ -197,7 +197,7 @@ begin_new_session <- function(
 #'    into the app database.
 #'
 #' @param session_id the id of session
-#' @param run_type Default 'quick' another choice is 'full' which takes longer
+#' @param run_type Default 'full' another choice is 'quick' which takes longer
 #'    since it checks all the lines of the expression matrix (this option is
 #'    only supported and functional in GXPA version with py3 - otherwise it
 #'    will just do a full dry run)
@@ -221,7 +221,7 @@ begin_new_session <- function(
 #' }
 #'
 dry_run_session <- function(session_id,
-                            run_type = c("quick", "full"),
+                            run_type = c("full", "quick"),
                             user_cookie = login_and_get_user_cookie()) {
   run_type <- match.arg(run_type)
 

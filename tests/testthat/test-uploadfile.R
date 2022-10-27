@@ -90,6 +90,12 @@ test_that("testing dry_run() success", {
     "No errors or warnings found in Dry Run"
   )
 
+  expect_message(
+    dry_run_session("70FO1W", run_type = 'quick'),
+    "No errors or warnings found in Dry Run"
+  )
+
+
 })
 
 test_that("testing remove_session() errors", {
@@ -195,11 +201,11 @@ test_that("testing get_GXPA_session_list() errors and success", {
   expect_equal(
     selected_output,
     list(
-      mod_time_readable = "2022-10-21 17:10",
-      perm_reason = "user is superuser",
       perm = "61",
-      type = "expr",
-      name = "test_GXPAinterface3",
+      mod_time = 1666374416,
+      mod_time_readable = "2022-10-21 10:10",
+      perm_reason = "user is superuser",
+      session_size = 0.168733,
       id = "70FO1W"
     )
   )
@@ -213,11 +219,11 @@ test_that("testing get_GXPA_session_list() errors and success", {
   expect_equal(
     selected_public_output,
     list(
-      mod_time_readable = "2019-07-24 17:07",
-      perm_reason = "no perm set for session",
       perm = "0",
-      type = "GEO",
-      name = "GSE28490",
+      mod_time = 1563990941,
+      mod_time_readable = "2019-07-24 10:07",
+      perm_reason = "no perm set for session",
+      session_size = 16.91714,
       id = "AQUKTU"
     )
   )
@@ -237,20 +243,22 @@ test_that("testing get_GXPA_session_details() success", {
           tmp_output$registered_files))
 
   expect_equal(
-    tmp_output[-6],
+    tmp_output[-7],
     list(
-      help = ", Use 'dir=1' to see all registered files; 'list_file_types=csv' to list all registered files of certain file types;'expr_details=1' to look up series info, number of samples & features, etc for expr related sessions;",
-      session_type = "expr",
-      # should be task finished based on previous delete session test
-      cur_step = "task_finished",
       cur_session = "70FO1W",
-      user = list(name = "fulpw", id = 61L),
+      session_type = 'expr',
       session_name = "test_GXPAinterface3",
-      details = list(series_descript = "Long description",
-                     num_genes = "101",
-                     series_name = "test_GXPAinterface",
-                     num_annots = "5",
-                     num_samples = "28")
+      cur_step = "task_finished",
+      help = ", Use 'dir=1' to see all registered files; 'list_file_types=csv' to list all registered files of certain file types;'expr_details=1' to look up series info, number of samples & features, etc for expr related sessions;",
+      # should be task finished based on previous delete session test
+      user = list(name = "fulpw", id = 61L),
+      details = list(
+        num_samples = "28",
+        num_genes = "101",
+        num_annots = "5",
+        series_name = "test_GXPAinterface",
+        series_descript = "Long description"
+      )
     )
   )
 

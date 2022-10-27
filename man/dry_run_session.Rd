@@ -6,14 +6,14 @@
 \usage{
 dry_run_session(
   session_id,
-  run_type = c("quick", "full"),
+  run_type = c("full", "quick"),
   user_cookie = login_and_get_user_cookie()
 )
 }
 \arguments{
 \item{session_id}{the id of session}
 
-\item{run_type}{Default 'quick' another choice is 'full' which takes longer
+\item{run_type}{Default 'full' another choice is 'quick' which takes longer
 since it checks all the lines of the expression matrix (this option is
 only supported and functional in GXPA version with py3 - otherwise it
 will just do a full dry run)}
