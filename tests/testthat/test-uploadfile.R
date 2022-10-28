@@ -199,13 +199,12 @@ test_that("testing get_GXPA_session_list() errors and success", {
   selected_output <- as.list(tmp_list[tmp_list$id == '70FO1W', ])[-(1:2)]
 
   expect_equal(
-    selected_output,
+    selected_output[-5],
     list(
       perm = "61",
       mod_time = 1666374416,
       mod_time_readable = "2022-10-21 10:10",
       perm_reason = "user is superuser",
-      session_size = 0.168733,
       id = "70FO1W"
     )
   )
@@ -217,13 +216,12 @@ test_that("testing get_GXPA_session_list() errors and success", {
 
   expect_false(any(public_list$id == '70FO1W'))
   expect_equal(
-    selected_public_output,
+    selected_public_output[-5],
     list(
       perm = "0",
       mod_time = 1563990941,
       mod_time_readable = "2019-07-24 10:07",
       perm_reason = "no perm set for session",
-      session_size = 16.91714,
       id = "AQUKTU"
     )
   )
