@@ -71,8 +71,23 @@ get_data_from_gxpa <- function(series_id,
         paste0(missing.genes, collapse = "\n")
       ))
     }
+    bad_case_genes <- genes[(toupper(genes) %in% toupper(colnames(dat))) &
+                              (!genes %in% colnames(dat))]
+    if (length(bad_case_genes) > 0) {
+      bad_case_genes_dat <- colnames(dat)[match(toupper(bad_case_genes),
+                                                toupper(colnames(dat)))]
+      message(paste0(
+        "These genes having incorrect case:\n",
+        paste0(
+          paste0(
+            bad_case_genes,
+            ' vs. ',
+            bad_case_genes_dat
+          ),
+          collapse = "\n")
+      ))
+    }
   }
-
   dat
 }
 

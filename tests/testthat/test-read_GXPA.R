@@ -68,8 +68,8 @@ test_that("read_GXPA output testing", {
   # confirming series results for 41
   test_data_info <-
     data.frame(
-      Cd33 = c(5.22, 5.22, 5.49, 5.29, 5.29, 5.36, 5.42, 5.11, 5.32, 5.45),
       Cd34 = c(9.48, 9.10, 9.55, 5.95, 5.91, 6.01, 9.93, 10.24, 9.85, 5.64),
+      Cd33 = c(5.22, 5.22, 5.49, 5.29, 5.29, 5.36, 5.42, 5.11, 5.32, 5.45),
       cell_type = c(
         "hypofunc_CD8", "hypofunc_CD8", "hypofunc_CD8",
         "functional_CD8", "functional_CD8", "functional_CD8",
@@ -81,9 +81,18 @@ test_that("read_GXPA output testing", {
     "GSM2107347", "GSM2107348", "GSM2107349", "GSM2107350", "GSM2107351",
     "GSM2107352", "GSM2107353", "GSM2107354", "GSM2107355", "GSM2107356"
   )
-  expect_equal(get_data_from_gxpa(41, c("Cd33", "Cd34"))[1:10, 1:3],
+
+  results_plus <- purrr::quietly(
+    ~ get_data_from_gxpa(41, c("CD33", "CD34",'aasaa'))[1:10, 1:3]
+  )()
+
+  expect_equal(results_plus$result,
     test_data_info,
     ignore_attr = TRUE
+  )
+  expect_equal(results_plus$messages,
+               c('These genes not present:\naasaa\n',
+                 'These genes having incorrect case:\nCD33 vs. Cd33\nCD34 vs. Cd34\n')
   )
 
 
