@@ -7,7 +7,8 @@
 begin_new_session(
   session_name,
   session_type = c("expr", "GEO", "features", "extract", "analysis"),
-  user_cookie = login_and_get_user_cookie()
+  user_cookie = login_and_get_user_cookie(),
+  server_url = "https://geneatlas.redda.bms.com/"
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ features, extract, analysis}
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}}. So, if
 you provide the cookie then it saves one interaction with the server.}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 If successful, the session ID (6 characters) will be returned, and

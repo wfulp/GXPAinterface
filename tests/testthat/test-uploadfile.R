@@ -173,8 +173,8 @@ test_that("testing loading and deleting series", {
 
   # Need to remove test series if it exists
   all_dat <- get_series_info_from_gxpa()
-  if (any(all_dat$name == 'test_GXPAinterface')) {
-    test_series_id <- all_dat$id[all_dat$name == 'test_GXPAinterface']
+  if (any(all_dat$name == 'test_GXPAinterface3')) {
+    test_series_id <- all_dat$id[all_dat$name == 'test_GXPAinterface3']
     suppressMessages(remove_series(test_series_id))
     Sys.sleep(10)
   }
@@ -185,7 +185,7 @@ test_that("testing loading and deleting series", {
   Sys.sleep(10)
 
   all_dat <- get_series_info_from_gxpa()
-  test_series_id <- all_dat$id[all_dat$name == 'test_GXPAinterface']
+  test_series_id <- all_dat$id[all_dat$name == 'test_GXPAinterface3']
   expect_message(remove_series(test_series_id),
                  "Success - series removed")
 })
@@ -254,7 +254,7 @@ test_that("testing get_GXPA_session_details() success", {
         num_samples = "28",
         num_genes = "101",
         num_annots = "5",
-        series_name = "test_GXPAinterface",
+        series_name = "test_GXPAinterface3",
         series_descript = "Long description"
       )
     )

@@ -4,7 +4,11 @@
 \alias{remove_series}
 \title{Remove series from database}
 \usage{
-remove_series(series_id, user_cookie = login_and_get_user_cookie())
+remove_series(
+  series_id,
+  user_cookie = login_and_get_user_cookie(),
+  server_url = "https://geneatlas.redda.bms.com/"
+)
 }
 \arguments{
 \item{series_id}{the id of the series you want to delete.}
@@ -13,6 +17,8 @@ remove_series(series_id, user_cookie = login_and_get_user_cookie())
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 Invisibly returns the full html output which can be useful in

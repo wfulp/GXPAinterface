@@ -1,9 +1,9 @@
-pandoc: '2.18'
-pkgdown: 2.0.6
+pandoc: 2.19.2
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-10-28T00:41Z
+last_built: 2023-01-13T23:08Z
 urls:
-  reference: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/reference
-  article: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/articles
+  reference: https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/reference
+  article: https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/articles
 

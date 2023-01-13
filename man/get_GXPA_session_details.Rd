@@ -4,13 +4,19 @@
 \alias{get_GXPA_session_details}
 \title{Get a GXPA session details}
 \usage{
-get_GXPA_session_details(session_id, GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"))
+get_GXPA_session_details(
+  session_id,
+  GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+  server_url = "https://geneatlas.redda.bms.com/"
+)
 }
 \arguments{
 \item{session_id}{GXPA session id}
 
 \item{GXPA_TOKEN}{GXPA API token. Default is to use the environment variable
 \code{GXPA_TOKEN}}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 list of session details

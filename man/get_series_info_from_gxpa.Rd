@@ -6,7 +6,8 @@
 \usage{
 get_series_info_from_gxpa(
   series_id = NULL,
-  GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")
+  GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+  server_url = "https://geneatlas.redda.bms.com/"
 )
 }
 \arguments{
@@ -15,6 +16,8 @@ series information}
 
 \item{GXPA_TOKEN}{GXPA API token. Default is to use the environment variable
 \code{GXPA_TOKEN}}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 a data.frame of series information for selected datasets, with the following
@@ -31,7 +34,7 @@ columns:
 Get series information from GXPA for a all data or a given series id
 }
 \details{
-Go to \href{https://geneatlas.redda.celgene.com/browse/settings}{GXPA Settings}
+Go to \href{https://geneatlas.redda.bms.com/browse/settings}{GXPA Settings}
 to get your token. Some datasets require you to login, so be sure to do
 that before you copy your token.
 
