@@ -7,7 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://img.shields.io/badge/codecov-95%25-green.svg)](https://covr.r-lib.org/)
+[![](https://img.shields.io/badge/codecov-96%25-green.svg)](https://covr.r-lib.org/)
 <!-- badges: end -->
 
 ## Overview
@@ -16,31 +16,27 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 is an R package with various function to access GXPA API and collection
 of functions to pre-process the data for importing into GXPA.
 
--   Importing from GXPA:
-    -   `get_GXPA_session_list()` to see all the sessions already on
-        GXPA
-    -   `get_GXPA_session_details()` to see details on a specific
-        sessions
-    -   `get_data_from_gxpa()` to import data from GXPA
-    -   `get_series_info_from_gxpa()` to import series information from
-        GXPA
--   Exporting to GXPA:
-    -   `begin_new_session()` to create a session (staging area) on GXPA
-    -   `send_file_to_session()` to export a file to GXPA
-    -   `login_and_get_user_cookie()` to obtain user cookie needed to
-        export to GXPA
-    -   `dry_run_session()` after you load files, you can do a dry run
-        to make sure files are formatted properly (quick or full dry run
-        options).
-    -   `load_session()` after your load files, you can run this to
-        trigger the task to load data from the session to the SQL
-        database.
-    -   `remove_session()` if you need to remove a series or session,
-        respectively.
--   File Preparation
-    -   `make_series_info_file()` to create a series information file
-    -   `check_files_for_GXPA()` to run many checks on expression data
-        and metadata
+- Importing from GXPA:
+  - `get_GXPA_session_list()` to see all the sessions already on GXPA
+  - `get_GXPA_session_details()` to see details on a specific sessions
+  - `get_data_from_gxpa()` to import data from GXPA
+  - `get_series_info_from_gxpa()` to import series information from GXPA
+- Exporting to GXPA:
+  - `begin_new_session()` to create a session (staging area) on GXPA
+  - `send_file_to_session()` to export a file to GXPA
+  - `login_and_get_user_cookie()` to obtain user cookie needed to export
+    to GXPA
+  - `dry_run_session()` after you load files, you can do a dry run to
+    make sure files are formatted properly (quick or full dry run
+    options).
+  - `load_session()` after your load files, you can run this to trigger
+    the task to load data from the session to the SQL database.
+  - `remove_session()` if you need to remove a series or session,
+    respectively.
+- File Preparation
+  - `make_series_info_file()` to create a series information file
+  - `check_files_for_GXPA()` to run many checks on expression data and
+    metadata
 
 ## Installation
 
