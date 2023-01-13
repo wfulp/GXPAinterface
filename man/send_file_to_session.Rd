@@ -8,7 +8,8 @@ send_file_to_session(
   session_id,
   filename_local,
   file_save_name,
-  user_cookie = login_and_get_user_cookie()
+  user_cookie = login_and_get_user_cookie(),
+  server_url = "https://geneatlas.redda.bms.com/"
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ send_file_to_session(
 \item{file_save_name}{file name to be saved as in GXPA. Must match a know name (see details)}
 
 \item{user_cookie}{user cookie (default is using \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}})}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 message indicating upload was successful
@@ -28,7 +31,7 @@ Importing data for an already opened GXPA session.
 }
 \details{
 The GXPA session needs to exist, so go to the
-\href{https://geneatlas.redda.celgene.com/sessions/}{GXPA app} to see open
+\href{https://geneatlas.redda.bms.com/sessions/}{GXPA app} to see open
 sessions and create a new one if needed. The session id can be found on the
 main sessions page or in the URL once in the session
 (6 uppercase chars or numbers)

@@ -6,6 +6,7 @@
 #' @param genes select genes
 #' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
 #' `GXPA_TOKEN`
+#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
 #'
 #' @return
 #'
@@ -13,7 +14,7 @@
 #' information.
 #'
 #' @details
-#' Go to [GXPA Settings](https://geneatlas.redda.celgene.com/browse/settings)
+#' Go to [GXPA Settings](https://geneatlas.redda.bms.com/browse/settings)
 #' to get your token. Some datasets require you to login, so be sure to do
 #' that before you copy your token.
 #'
@@ -33,7 +34,8 @@
 #'
 get_data_from_gxpa <- function(series_id,
                                genes,
-                               GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
+                               GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+                               server_url = "https://geneatlas.redda.bms.com/") {
 
   # input catching
   if (missing(series_id)) {
@@ -50,7 +52,8 @@ get_data_from_gxpa <- function(series_id,
 
   # build the URL to access the data
   get_url <- paste0(
-    "https://geneatlas.redda.celgene.com/series_api/series_data_view/",
+    server_url,
+    "series_api/series_data_view/",
     series_id,
     "?sample_labels=1&transpose=1&no_feat_info=1&name=",
     paste0(genes, collapse = "&name=")
@@ -61,15 +64,30 @@ get_data_from_gxpa <- function(series_id,
 
   # note if any of the requested genes are missing
   if (!is.null(genes)) {
-    missing.genes <- genes[!genes %in% colnames(dat)]
+    missing.genes <- genes[!toupper(genes) %in% toupper(colnames(dat))]
     if (length(missing.genes) > 0) {
       message(paste0(
         "These genes not present:\n",
         paste0(missing.genes, collapse = "\n")
       ))
     }
+    bad_case_genes <- genes[(toupper(genes) %in% toupper(colnames(dat))) &
+                              (!genes %in% colnames(dat))]
+    if (length(bad_case_genes) > 0) {
+      bad_case_genes_dat <- colnames(dat)[match(toupper(bad_case_genes),
+                                                toupper(colnames(dat)))]
+      message(paste0(
+        "These genes having incorrect case:\n",
+        paste0(
+          paste0(
+            bad_case_genes,
+            ' vs. ',
+            bad_case_genes_dat
+          ),
+          collapse = "\n")
+      ))
+    }
   }
-
   dat
 }
 
@@ -81,6 +99,7 @@ get_data_from_gxpa <- function(series_id,
 #' series information
 #' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
 #' `GXPA_TOKEN`
+#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
 #'
 #' @return
 #'
@@ -94,7 +113,7 @@ get_data_from_gxpa <- function(series_id,
 #' - `perm_id`: dataset perm_id
 #'
 #' @details
-#' Go to [GXPA Settings](https://geneatlas.redda.celgene.com/browse/settings)
+#' Go to [GXPA Settings](https://geneatlas.redda.bms.com/browse/settings)
 #' to get your token. Some datasets require you to login, so be sure to do
 #' that before you copy your token.
 #'
@@ -123,7 +142,8 @@ get_data_from_gxpa <- function(series_id,
 #' all_dat$id[all_dat$name == "Beat AML - OHSU"]
 #'
 get_series_info_from_gxpa <- function(series_id = NULL,
-                                      GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
+                                      GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+                                      server_url = "https://geneatlas.redda.bms.com/") {
   if (is.null(GXPA_TOKEN) ||
     is.na(GXPA_TOKEN) ||
     GXPA_TOKEN == "") {
@@ -131,7 +151,10 @@ get_series_info_from_gxpa <- function(series_id = NULL,
   }
 
   full_dat <- get_info_from_url(
-    "https://geneatlas.redda.celgene.com/series_api/series/?format=json&name_only=1",
+    paste0(
+      server_url,
+      "series_api/series/?format=json&name_only=1"
+    ),
     GXPA_TOKEN
   )$results
 
