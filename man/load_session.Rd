@@ -7,7 +7,8 @@
 load_session(
   session_id,
   load_type = c("upload_new", "update_series", "add_new_scores", "load_coords"),
-  user_cookie = login_and_get_user_cookie()
+  user_cookie = login_and_get_user_cookie(),
+  server_url = "https://geneatlas.redda.bms.com/"
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ load_session(
 \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}} to get it. If you don't provide the cookie
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 Invisibly returns the full html output which can be useful in

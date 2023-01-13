@@ -6,7 +6,8 @@
 \usage{
 login_and_get_user_cookie(
   GXPA_username = Sys.getenv("GXPA_USERNAME"),
-  GXPA_password = Sys.getenv("GXPA_PASSWORD")
+  GXPA_password = Sys.getenv("GXPA_PASSWORD"),
+  server_url = "https://geneatlas.redda.bms.com/"
 )
 }
 \arguments{
@@ -15,6 +16,8 @@ login_and_get_user_cookie(
 
 \item{GXPA_password}{password for GXPA. Default is to use the environment variable
 \code{GXPA_PASSWORD}}
+
+\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
 }
 \value{
 user cookie
