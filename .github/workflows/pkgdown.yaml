@@ -1,4 +1,4 @@
-name: BioGit-R-CMD-check
+name: pkgdown
 on:
   push:
     branches: [main, develop]
@@ -11,8 +11,6 @@ env:
 jobs:
   pkgdown:
     runs-on: [ ubuntu22 ]
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: r-lib/actions/setup-pandoc@v2
