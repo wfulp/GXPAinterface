@@ -1,3 +1,7 @@
+# GXPAinterface 0.2.2
+
+Adding internal GitHub Actions for R package building and website creation
+
 # GXPAinterface 0.2.1
 
 Making `server_url` a parameter for many functions and setting default to BMS server: 
