@@ -4,6 +4,8 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+env:
+  R_VERSION: 4.2.1
 jobs:
   build:
     runs-on: [ ubuntu22 ]
