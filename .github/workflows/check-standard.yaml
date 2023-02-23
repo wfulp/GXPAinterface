@@ -9,6 +9,12 @@ env:
 jobs:
   build:
     runs-on: [ ubuntu22 ]
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GXPA_TOKEN: ${{ secrets.GXPA_TOKEN }}
+      GXPA_USERNAME: ${{ secrets.GXPA_USERNAME }}
+      GXPA_PASSWORD: ${{ secrets.GXPA_PASSWORD }}
+      R_KEEP_PKG_SOURCE: yes
     steps:
       - uses: actions/checkout@v3
       - uses: r-lib/actions/setup-pandoc@v2
