@@ -9,8 +9,10 @@ on:
 env:
   R_VERSION: 4.2.1
 jobs:
-  pkgdown:
+  build:
     runs-on: [ ubuntu22 ]
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: r-lib/actions/setup-pandoc@v2
