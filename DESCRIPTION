@@ -17,11 +17,11 @@ BugReports:
 Imports:
     httr,
     jsonlite,
+    purrr,
     testthat (>= 3.0.0)
 Suggests: 
     dplyr,
     DT,
-    purrr,
     readr,
     revealxpress,
     SiteMinderBMS,
