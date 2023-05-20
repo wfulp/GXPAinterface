@@ -1,0 +1,679 @@
+---
+title: "`r paste0('Importing Xpress ID ', params$xpress_project_id, ' and Uploading to GXPA')`"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: FALSE
+    highlight: pygment
+    code_folding: hide
+    theme:
+      primary: "#BE2BBB"
+      secondary: "#EEE7E7"
+      success: "#1dce9b"
+      info: "#009fba"
+      warning: "#ffac25"
+      danger: "#df603a"
+params:
+  xpress_project_id: 22282
+  output_dir_path: "Output_Files"
+  control_list: "list(VSLABL = 'Control', bms_id = 'HuRef')"
+  load_session: FALSE
+---
+
+```{r setup, results='hide', echo=TRUE, message=FALSE}
+# knitr::opts_chunk$set(echo = FALSE)
+
+library(GXPAinterface)
+library(SiteMinderBMS)
+library(revealxpress)
+library(dplyr)
+library(DT)
+library(readr)
+library(purrr)
+library(stringr)
+
+qc_vars_to_keep <- c(
+  'QC_EstimatedLibrarySize',
+  'QC_DynamicRange',
+  'QC_FractionContaminatedReads',
+  'QC_FractionHemoglobin',
+  'QC_FractionRibosomal',
+  'QC_ReadsAligned',
+  'QC_Median5to3Bias',
+  'QC_FractionIntergenicBases'
+) %>% 
+  tolower()
+
+
+```
+
+
+# Report Parameters
+
+```{r params}
+if (is.na(params$xpress_project_id)) {
+  stop('params$xpress_project_id can not be missing')
+}
+if (is.na(params$output_dir_path)) {
+  stop('params$output_dir_path can not be missing')
+}
+params_for_tab <- lapply(params, function(xx) {ifelse(is.null(xx),'NULL',xx)})
+dt_tab <- as.list.data.frame(params_for_tab) %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as_tibble(rownames = 'params', .name_repair = make.names) %>% 
+  rename(value = X)
+
+datatable(dt_tab, 
+          rownames = FALSE,
+          caption = 'Report Parameters',
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+```
+
+
+# Connecting to Xpress Database and Querying project ID `r params$xpress_project_id`
+
+```{r query-xpress, message=FALSE}
+ if (SiteMinderBMS::validateCookies(prompt = FALSE) == 1 && !interactive()) {
+    stop('Not valid cached SiteMinder cookies.\n',
+         'You could save your credentials using: \n',
+         'SiteMinderBMS::captureCookies() before running this report')
+  } 
+ 
+output_directory <-  params$output_dir_path
+
+rx <- connect(username = SiteMinderBMS::getUserInfo()$User)
+
+xpress_project_id <- params$xpress_project_id
+
+xpress_project_info <- rx$get_projects(xpress_project_id)
+
+if (nrow(xpress_project_info) == 0) {
+  stop('No project with xpress_id ', xpress_project_id,' found.')
+}
+
+xpress_project_info <- xpress_project_info %>% 
+  dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', ''))))
+
+datatable(xpress_project_info, 
+          rownames = FALSE,
+          caption = 'Project info',
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+### Project Versions
+```{r versions}
+
+project_versions = rx$get_project_versions(xpress_project_id)
+project_versions
+
+```
+
+### Project Annotations
+```{r annotations}
+project_annotations <- rx$get_project_annotation_versions(xpress_project_id) %>% 
+  dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', ''))))
+
+project_annotation <- project_annotations %>% 
+  filter(xpress_id == xpress_project_id,
+         preferred) %>% 
+  pull(annotation_id)
+
+datatable(project_annotations, 
+          rownames = FALSE,
+          caption = 'Project Annotations',
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+## Sample Metadata
+
+```{r samples, message=FALSE}
+samples = rx$search_samples(xpress_project_id, 
+                            annotation_id = project_annotation)
+colnames(samples) <- colnames(samples) %>% tolower()
+# Need to hardcode some var names
+colnames(samples)[colnames(samples) == 'timepoint'] <- 'Timepoint'
+colnames(samples)[colnames(samples) == 'barcode'] <- 'Barcode'
+
+if (!is.null(params$control_list)) {
+  control_list <- eval(parse(text = params$control_list))
+  bad_ids <- purrr::imap(control_list, 
+                         function(x, idx) {
+                           if (any(colnames(samples) == idx)) {
+                             samples$name[samples[[idx]] %in% x]
+                           }
+                         }) %>% 
+    unlist()
+  print(paste0('Following control IDs removed: ', 
+               paste0(bad_ids, collapse = ', ')))
+} else {
+  bad_ids <- character()
+}
+
+good_ids <- setdiff(samples$name, bad_ids)
+
+samples <- samples[samples$name %in% good_ids, ]
+
+# Dropping extra QC_ vars and NA columns
+
+samples <- samples %>% 
+  dplyr::select(!contains('QC_'), any_of(qc_vars_to_keep))
+for (i in qc_vars_to_keep) {
+  if (!any(colnames(samples) == i)) {
+    warning(i, ' of the Standard QC definition is missing. Excluding from definition')
+    samples[[i]] <- NA
+  }
+}
+
+samples <- samples %>% 
+  mutate(
+    passed_standard_qc = ifelse(
+      (is.na(samples$qc_estimatedlibrarysize) | qc_estimatedlibrarysize >= 3000000) &
+        (is.na(samples$qc_dynamicrange) | qc_dynamicrange > 265) &
+        (is.na(samples$qc_fractioncontaminatedreads) | qc_fractioncontaminatedreads <= 0.05) &
+        (is.na(samples$qc_fractionhemoglobin) | qc_fractionhemoglobin <= 0.05) &
+        (is.na(samples$qc_fractionribosomal) | qc_fractionribosomal <= 0.05),
+      TRUE,
+      FALSE
+    )
+  ) %>% 
+  dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', '')))) %>% 
+  dplyr::select(`_id` = name, everything())
+
+
+# Moving some consistent vars to series file
+move_to_series <- samples[ ,
+  purrr::map_dbl(samples, ~ length(unique(.x))) == 1 &
+    !colnames(samples) %in% c(qc_vars_to_keep, 'passed_standard_qc')
+] %>% unique()
+  
+samples <- samples %>% 
+  dplyr::select(!all_of(colnames(move_to_series)))
+
+
+datatable(samples, 
+          rownames = FALSE,
+          caption = paste0('Sample Metadata (', length(bad_ids),
+                           ' controls removed)'),
+          options = list(
+            autoWidth = TRUE, 
+            paging = TRUE,
+            searching = TRUE
+          ))
+
+```
+
+Note there are `r sum(samples$passed_standard_qc)` samples that are flagged for
+failing standard QC.
+
+Removed missing or NA columns, and moved columns with a single value to the series file.
+
+
+
+## Feature Set Metadata
+
+```{r fsets}
+fsets = rx$get_featuresets() %>% 
+  dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', ''))))
+
+datatable(fsets, 
+          rownames = FALSE,
+          caption = 'Featureset Metadata',
+          options = list(
+            autoWidth = TRUE, 
+            paging = TRUE,
+            searching = TRUE
+          ))
+
+```
+
+### Feature Types
+
+```{r get-feature-types}
+
+datatable(rx$get_feature_types(), 
+          rownames = FALSE,
+          caption = 'Feature Types',
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+## Feature Metadata for a Featureset
+
+```{r feat}
+feat = rx$search_features(
+  featureset = fsets[fsets$name == xpress_project_info$featuresets,],
+  feature_type = "genes"
+) %>% 
+  rename(
+    hgnc_symbol = Symbol,
+    ensembl_gene_id = name
+  ) %>% 
+  dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', ''))))
+
+datatable(head(feat, n = 10), 
+          rownames = FALSE,
+          caption = paste0('Feature Metadata (showing first 10 rows of ',
+                           nrow(feat),')'),
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+
+## Measurement Data
+
+```{r msets}
+msets = rx$search_measurementsets(xpress_project_id) %>% 
+  dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', ''))))
+
+datatable(msets, 
+          rownames = FALSE,
+          caption = 'Measurement Data',
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+## Expression Data: TPM
+
+```{r expr-tpm, message=FALSE}
+tpm_index <- msets$feature_type == 'genes' &
+   grepl('TPM', msets$attribute, ignore.case = TRUE) & 
+  !grepl('Estimate', msets$attribute, ignore.case = TRUE)
+
+if (sum(tpm_index) != 1) {
+  stop('Could not find proper TPM measurement. ',
+       'You may have to tweak the TPM selection code manually')
+}
+
+eset_tpm <- rx$search_expression(xpress_project_id, 
+                             measurementset = msets[tpm_index,],
+                             annotation_id = project_annotation)
+expr_tpm <- log2(Biobase::exprs(eset_tpm) + 1)
+# subsetting on samples
+expr_tpm <- expr_tpm[, match(samples$`_id`, colnames(expr_tpm))]
+
+datatable(expr_tpm[1:10, 1:min(5,ncol(expr_tpm))], 
+          rownames = TRUE,
+          caption = paste0(
+            'Expression Data: "', 
+            msets$attribute[tpm_index],
+            '" (showing subset; full dataset dim: ',
+            nrow(expr_tpm),' rows by ' , 
+            ncol(expr_tpm), ' columns)'
+          ),
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+## Expression Data: Counts
+
+```{r expr-counts, message=FALSE}
+counts_index <- msets$feature_type == 'genes' &
+   grepl('Count', msets$attribute, ignore.case = TRUE) & 
+  !grepl('Star|Normalized', msets$attribute, ignore.case = TRUE)
+
+if (sum(counts_index) != 1) {
+  stop('Could not find proper Counts measurement. ',
+       'You may have to tweak the Counts selection code manually')
+}
+
+eset_counts <- rx$search_expression(xpress_project_id, 
+                             measurementset = msets[counts_index,],
+                             annotation_id = project_annotation)
+expr_counts <- Biobase::exprs(eset_counts)
+# subsetting on samples
+expr_counts <- expr_counts[, match(samples$`_id`, colnames(expr_counts))]
+
+datatable(expr_counts[1:10, 1:min(5,ncol(expr_counts))], 
+          rownames = TRUE,
+          caption = paste0(
+            'Expression Data: "', 
+            msets$attribute[counts_index],
+            '" (showing subset; full dataset dim: ',
+            nrow(expr_counts),' rows by ' , 
+            ncol(expr_counts), ' columns)'
+          ),
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+
+```
+
+
+
+# Switching to Hugo and removing duplicates
+
+```{r to-hugo-and-clean, warning=FALSE}
+
+hugo_na <- which(is.na(feat[['gene_symbol']]))
+hugo_blank <- which(feat[['gene_symbol']] == "")
+toRemove <- union(hugo_na, hugo_blank)
+
+# linking feat and expr datasets and removing missing black hugo if needed
+if (length(toRemove) > 0) {
+  feat_sub <- feat[-toRemove,]
+  expr_tpm_sub <- expr_tpm[match(feat_sub[['ensembl_gene_id']], 
+                                 rownames(expr_tpm)), ][-toRemove, ]
+  expr_counts_sub <- expr_counts[match(feat_sub[['ensembl_gene_id']], 
+                                       rownames(expr_counts)), ][-toRemove, ]
+} else {
+  feat_sub <- feat
+  expr_tpm_sub <- expr_tpm[match(feat_sub[['ensembl_gene_id']], 
+                                 rownames(expr_tpm)), ]
+  expr_counts_sub <- expr_counts[match(feat_sub[['ensembl_gene_id']], 
+                                       rownames(expr_counts)), ]
+}
+# Remove hugo duplicates
+dup_hugo <- unique(feat_sub[['gene_symbol']][(duplicated(feat_sub[['gene_symbol']]))])
+if (length(dup_hugo) > 0) {
+  dup_to_drop_list <- lapply(
+    X = dup_hugo,
+    FUN = function(xx) {
+      tmp_expr <- expr_tpm_sub[feat_sub[['gene_symbol']] == xx,]
+      tmp_out <- feat_sub[feat_sub[['gene_symbol']] == xx,]
+      tmp_out$TPM_mean <- apply(tmp_expr, 1, mean)
+      tmp_out$status <- if_else(tmp_out$TPM_mean == max(tmp_out$TPM_mean),
+                                'Kept', 'Dropped')
+      # Need to account when multiple max (take first one)
+      if (sum(tmp_out$TPM_mean == max(tmp_out$TPM_mean)) > 1) {
+        tmp_out$status[duplicated(tmp_out$status) & 
+                         tmp_out$status == 'Kept'] <- 'Dropped'
+      }
+      tmp_out
+    }
+  )
+  dup_to_drop <- bind_rows(dup_to_drop_list)
+  
+  genes_to_drop <- dup_to_drop[['ensembl_gene_id']][dup_to_drop$status == 'Dropped']
+  
+  feat_sub_hugo <- feat_sub[!rownames(feat_sub) %in% genes_to_drop,]
+  expr_tpm_hugo <- expr_tpm_sub[!rownames(expr_tpm_sub) %in% genes_to_drop,]
+  expr_counts_hugo <- expr_counts_sub[!rownames(expr_counts_sub) %in% genes_to_drop,]
+} else {
+  feat_sub_hugo <- feat_sub
+  expr_tpm_hugo <- expr_tpm_sub
+  expr_counts_hugo <- expr_counts_sub
+}
+if (anyDuplicated(rownames(expr_tpm_hugo)) > 0) {
+  stop('Duplicated rownames found')
+}
+rownames(expr_tpm_hugo) <- feat_sub_hugo[['gene_symbol']]
+rownames(expr_counts_hugo) <- feat_sub_hugo[['gene_symbol']]
+
+```
+
+## Listing Duplicate Hugo Entries
+
+```{r dup-cases, eval=length(dup_hugo) > 0}
+dt_tab <- dup_to_drop %>% 
+    select(gene_symbol, ensembl_gene_id, TPM_mean, status) %>% 
+    arrange(gene_symbol, desc(TPM_mean))
+
+datatable(dt_tab, 
+          rownames = FALSE,
+          caption = 'Duplicated Hugo entries',
+          filter = 'top', 
+          options = list(
+            pageLength = 10, 
+            autoWidth = TRUE
+          ))
+```
+
+
+# Writing Xpress Files to `r params$output_dir_path`
+
+```{r write-files, warning=FALSE}
+
+dir.create(params$output_dir_path)
+
+write_csv(samples, file = file.path(params$output_dir_path, 'expr.samples.csv'))
+
+write_csv(feat_sub_hugo, file = file.path(params$output_dir_path, 'gene_linking_file.csv'))
+
+write.table(expr_tpm_hugo %>% as.data.frame(), 
+            file = file.path(params$output_dir_path, 'expr.expr.txt'),
+            sep = "\t", row.names = TRUE, quote = FALSE)
+
+write.table(expr_counts_hugo %>% as.data.frame(), 
+            file = file.path(params$output_dir_path, 'expr.expr_counts.txt'),
+            sep = "\t", row.names = TRUE, quote = FALSE)
+
+```
+
+Successfully wrote files to `r params$output_dir_path`
+
+- `r file.path(params$output_dir_path, 'expr.samples.csv')`
+- `r file.path(params$output_dir_path, 'gene_linking_file.csv')`
+- `r file.path(params$output_dir_path, 'expr.expr.txt')`
+- `r file.path(params$output_dir_path, 'expr.expr_counts.txt')`
+
+
+# GXPA Upload
+
+## Running GXPA::check_files_for_GXPA()
+
+```{r check-files}
+
+check_files_for_GXPA(
+  expr_file = file.path(params$output_dir_path, 'expr.expr.txt'),
+  samples_file = file.path(params$output_dir_path, 'expr.samples.csv')
+)
+
+```
+
+## Making Series File
+
+Moving any variables with identical values in samples to series file
+
+```{r series-files}
+
+colnames(move_to_series)[colnames(move_to_series) == 'species'] <- 'organism'
+if (is.null(move_to_series$organism)) {
+  move_to_series$organism <- 'human'
+}
+
+sample_levels <- map_dbl(samples %>% 
+                      select(!contains('QC_'), -passed_standard_qc), ~ length(unique(.x)))
+
+default_group <-  names(sort(sample_levels, decreasing = FALSE))[1]
+default_color <-  names(sort(sample_levels, decreasing = FALSE))[2]
+if (sample_levels[[default_color]] > 5) {
+  default_color <- default_group
+}
+
+make_series_info_file(
+  filename = file.path(params$output_dir_path, 'expr.series_info.csv'),
+  series_name = xpress_project_info$display_name,
+  series_descript = paste0(imap_chr(as.list(xpress_project_info), 
+                                    \(x, idx) paste0(idx, ": ", x)), 
+                           collapse = ',  '),
+  default_group = default_group,
+  organism = move_to_series$organism,
+  expr_units = 'RNAseq log2(TPM + 1)',
+  default_color = default_color,
+  extra.list = as.list(move_to_series %>% 
+                         dplyr::select(-organism))
+)
+
+datatable(read.csv(file.path(params$output_dir_path, 'expr.series_info.csv')), 
+          rownames = FALSE,
+          caption = 'Series File',
+          filter = 'top', 
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+
+```
+
+## Making Score Files
+
+```{r score-files}
+
+expr_tpm_means <- data.frame(
+  mean = apply(expr_tpm_hugo, 1, mean)
+) %>% 
+  arrange(desc(mean)) %>% 
+  mutate(rank =  1:nrow(expr_tpm_hugo))
+
+write.table(expr_tpm_means %>% as.data.frame(), 
+            file = file.path(params$output_dir_path, 'expr_data.mean.txt'),
+            sep = "\t", row.names = TRUE, quote = FALSE)
+
+
+expr_tpm_sd <- data.frame(
+  sd = apply(expr_tpm_hugo, 1, sd)
+) %>% 
+  arrange(desc(sd)) %>% 
+  mutate(rank =  1:nrow(expr_tpm_hugo))
+
+write.table(expr_tpm_sd %>% as.data.frame(), 
+            file = file.path(params$output_dir_path, 'expr_data.stdev.txt'),
+            sep = "\t", row.names = TRUE, quote = FALSE)
+
+
+score_file <- data.frame(
+  name = c('mean', 'stdev'),
+  filename = c('expr_data.mean.txt', 'expr_data.stdev.txt'),
+  description = c('mean across all samples', 'stdev across all samples'),
+  score_type = c('mean', 'stdev'),
+  rank_threshold = 200,
+  score_col = 1,
+  rank_col = 2,
+  group1 = 'all',
+  group2 = ''
+)
+  
+write_csv(score_file, file = file.path(params$output_dir_path, 'expr.score_info.csv'))
+
+datatable(score_file, 
+          rownames = FALSE,
+          caption = 'Score File',
+          options = list(
+            autoWidth = TRUE, 
+            paging = FALSE,
+            searching = FALSE
+          ))
+
+```
+
+## Uploading Files
+
+```{r uploading-files}
+# upload all the files
+all_files = list.files(params$output_dir_path,
+                       full.names = TRUE)
+upload_files <- all_files[!grepl('gene_linking_file', all_files)]
+
+# need specific order for uploading
+first_files <- c('expr.series_info.csv', 'expr.samples.csv',
+                 'expr.expr.txt', 'expr.score_info.csv')
+upload_files <- c(
+  upload_files[match(first_files, basename(upload_files))],
+  upload_files[!basename(upload_files) %in% first_files]
+)
+
+# GXPA session ------------------------------------------------------------
+
+
+
+user_cookie = login_and_get_user_cookie()
+
+# make a new session
+message('Making a new session:')
+session_name = paste0('Xpress_', xpress_project_info$xpress_id,'_',
+                      format(Sys.time(), "%Y%m%d%H%M"))
+new_id = begin_new_session(session_name, user_cookie = user_cookie)
+
+for (f in upload_files) {
+
+  tmp_message <- testthat::capture_message(
+    send_file_to_session(session_id = new_id,
+                         user_cookie = user_cookie,
+                         filename_local = f,
+                         file_save_name = basename(f)))
+  if (str_detect(tmp_message$message,
+                 'Successfully uploaded',
+                 negate = TRUE)) {
+    stop(f, ' could not be uploaded successfully in session ', session_name)
+  }
+}
+```
+
+## Dry Run and Loading Session (optional)
+
+```{r dry-run}
+# dry run
+message('Running dry_run():')
+dry_run_session(new_id, run_type = 'full')
+
+
+
+if (params$load_session) {
+  
+  message('Loeading series:')
+  load_session(new_id, load_type = "upload_new")
+  
+  Sys.sleep(5)
+  # Confirming data has been loaded
+  all_dat <- get_series_info_from_gxpa()
+  
+  if (!any(all_dat$name == str_squish(xpress_project_info$display_name))) {
+    warning('Could not confirm series was successful, checking again')
+    Sys.sleep(10)
+    if (!any(all_dat$name ==  str_squish(xpress_project_info$display_name))) {
+      stop('Could not confirm series was successful')
+    }
+  }
+  
+  message('Confirmed series uploaded to GXPA')
+  datatable(all_dat[all_dat$name ==  str_squish(xpress_project_info$display_name), ], 
+            rownames = FALSE,
+            caption = 'GXPA Data Description',
+            options = list(
+              autoWidth = TRUE, 
+              paging = FALSE,
+              searching = FALSE
+            ))
+  
+  
+}
+
+```
+
