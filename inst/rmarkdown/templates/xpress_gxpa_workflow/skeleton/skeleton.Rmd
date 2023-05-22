@@ -506,6 +506,8 @@ if (is.null(move_to_series$organism)) {
   move_to_series$organism <- 'human'
 }
 
+move_to_series$qc_metrics = "Sequencing quality is assessed in the bulk RNAseq pipeline by a number of QC modules including FastQC, Samtools, Picard, and DupRadarref, and these metrics are loaded into the Xpress database for analysts to identify poor quality samples that should be excluded from further analysis. Using the definition found on the RNA-Seq QC Standards confluence page (https://biodoc.pri.bms.com:8443/display/NWP/RNA-Seq+QC+Standards) I created a passed_standard_qc variable if all available QC measures passed" 
+
 sample_levels <- map_dbl(samples %>% 
                       select(!contains('QC_'), -passed_standard_qc), ~ length(unique(.x)))
 
