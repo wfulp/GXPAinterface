@@ -16,16 +16,16 @@ BugReports:
     https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/issues
 Imports:
     httr,
-    jsonlite,
-    purrr,
-    testthat (>= 3.0.0)
+    jsonlite
 Suggests: 
     dplyr,
     DT,
+    purrr,
     readr,
-    revealxpress,
+    revealxpress (>= 1.0.5),
     SiteMinderBMS,
-    stringr
+    stringr,
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -17,8 +17,10 @@ output:
 params:
   xpress_project_id: 22282
   output_dir_path: "Output_Files"
-  control_list: "list(VSLABL = 'Control', bms_id = 'HuRef')"
+  control_list: "list(VSLABL = 'Control', bms_id = 'HuRef', treatment = 'UHR')"
   load_session: FALSE
+  additional_metadata: NULL
+  series_descript: 
 ---
 
 ```{r setup, results='hide', echo=TRUE, message=FALSE}
@@ -150,8 +152,28 @@ colnames(samples) <- colnames(samples) %>% tolower()
 colnames(samples)[colnames(samples) == 'timepoint'] <- 'Timepoint'
 colnames(samples)[colnames(samples) == 'barcode'] <- 'Barcode'
 
+if (!is.null(params$additional_metadata) && 
+    file.exists(params$additional_metadata)) {
+  print(paste("Additional metadata:", params$additional_metadata))
+  add_meta <- read.csv(params$additional_metadata)
+  samples <- merge(samples, 
+                   add_meta, 
+                   by.x = "name", 
+                   by.y = colnames(add_meta)[1], 
+                   all.x = TRUE)
+  print(paste("Num cols metadata:", ncol(samples)))
+  print(paste("Num rows metadata:", nrow(samples)))
+}
+
 if (!is.null(params$control_list)) {
   control_list <- eval(parse(text = params$control_list))
+  print(paste("control_list:", paste(control_list, collapse = ",")))
+  print(paste(
+    "columns present:", 
+    paste(
+      names(control_list)[names(control_list) %in% colnames(samples)], 
+      collapse = ",")
+  ))
   bad_ids <- purrr::imap(control_list, 
                          function(x, idx) {
                            if (any(colnames(samples) == idx)) {
@@ -197,14 +219,19 @@ samples <- samples %>%
 
 
 # Moving some consistent vars to series file
-move_to_series <- samples[ ,
-  purrr::map_dbl(samples, ~ length(unique(.x))) == 1 &
-    !colnames(samples) %in% c(qc_vars_to_keep, 'passed_standard_qc')
-] %>% unique()
+cols_to_move = as.logical(purrr::map_dbl(
+  samples, 
+  ~ length(unique(.x))) == 1 & !colnames(samples) %in% 
+    c(qc_vars_to_keep, 'passed_standard_qc'))
+if (any(cols_to_move)) {
+  move_to_series <- samples[ , cols_to_move, drop = FALSE] %>% unique()
   
-samples <- samples %>% 
+  samples <- samples %>% 
   dplyr::select(!all_of(colnames(move_to_series)))
 
+} else {
+  move_to_series <- data.frame(organism = 'human')
+}
 
 datatable(samples, 
           rownames = FALSE,
@@ -265,7 +292,7 @@ feat = rx$search_features(
   feature_type = "genes"
 ) %>% 
   rename(
-    hgnc_symbol = Symbol,
+    gene_symbol = Symbol,
     ensembl_gene_id = name
   ) %>% 
   dplyr::select(where(~ !all(is.na(.x) | .x %in% c('\"NA\"', ''))))
@@ -400,6 +427,7 @@ if (length(toRemove) > 0) {
 # Remove hugo duplicates
 dup_hugo <- unique(feat_sub[['gene_symbol']][(duplicated(feat_sub[['gene_symbol']]))])
 if (length(dup_hugo) > 0) {
+  print(paste("Found duplicate symbols, n=", length(dup_hugo)))
   dup_to_drop_list <- lapply(
     X = dup_hugo,
     FUN = function(xx) {
@@ -424,6 +452,7 @@ if (length(dup_hugo) > 0) {
   expr_tpm_hugo <- expr_tpm_sub[!rownames(expr_tpm_sub) %in% genes_to_drop,]
   expr_counts_hugo <- expr_counts_sub[!rownames(expr_counts_sub) %in% genes_to_drop,]
 } else {
+  print("No duplicate symbols found")
   feat_sub_hugo <- feat_sub
   expr_tpm_hugo <- expr_tpm_sub
   expr_counts_hugo <- expr_counts_sub
@@ -464,7 +493,7 @@ write_csv(samples, file = file.path(params$output_dir_path, 'expr.samples.csv'))
 
 write_csv(feat_sub_hugo, file = file.path(params$output_dir_path, 'gene_linking_file.csv'))
 
-write.table(expr_tpm_hugo %>% as.data.frame(), 
+write.table(round(expr_tpm_hugo, 5) %>% as.data.frame(), 
             file = file.path(params$output_dir_path, 'expr.expr.txt'),
             sep = "\t", row.names = TRUE, quote = FALSE)
 
@@ -506,7 +535,15 @@ if (is.null(move_to_series$organism)) {
   move_to_series$organism <- 'human'
 }
 
-move_to_series$qc_metrics = "Sequencing quality is assessed in the bulk RNAseq pipeline by a number of QC modules including FastQC, Samtools, Picard, and DupRadarref, and these metrics are loaded into the Xpress database for analysts to identify poor quality samples that should be excluded from further analysis. Using the definition found on the RNA-Seq QC Standards confluence page (https://biodoc.pri.bms.com:8443/display/NWP/RNA-Seq+QC+Standards) I created a passed_standard_qc variable if all available QC measures passed" 
+move_to_series$qc_metrics = "Sequencing quality is assessed in the bulk RNAseq pipeline by a number of QC modules including FastQC, Samtools, Picard, and DupRadarref, and these metrics are loaded into the Xpress database for analysts to identify poor quality samples that should be excluded from further analysis. Using the definition found on the RNA-Seq QC Standards confluence page (https://biodoc.pri.bms.com:8443/display/NWP/RNA-Seq+QC+Standards) I created a passed_standard_qc variable if all available QC measures passed"
+
+move_to_series$xpress_url = 
+  paste0("https://report.pri.bms.com/xpress/details/?XpressID=",
+         params$xpress_project_id)
+
+move_to_series$ngs360_url = 
+  paste0("https://ngs.rdcloud.bms.com/projects/", 
+         xpress_project_info$project_name)
 
 sample_levels <- map_dbl(samples %>% 
                       select(!contains('QC_'), -passed_standard_qc), ~ length(unique(.x)))
@@ -517,12 +554,19 @@ if (sample_levels[[default_color]] > 5) {
   default_color <- default_group
 }
 
+series_descript = paste0(imap_chr(as.list(xpress_project_info), 
+                                    \(x, idx) paste0(idx, ": ", x)), 
+                           collapse = ',  ')
+if (!is.null(params$series_descript)) {
+  series_descript = paste0(series_descript, 
+                           ", Additional Description: ", 
+                           params$series_descript)
+}
+
 make_series_info_file(
   filename = file.path(params$output_dir_path, 'expr.series_info.csv'),
   series_name = xpress_project_info$display_name,
-  series_descript = paste0(imap_chr(as.list(xpress_project_info), 
-                                    \(x, idx) paste0(idx, ": ", x)), 
-                           collapse = ',  '),
+  series_descript = series_descript,
   default_group = default_group,
   organism = move_to_series$organism,
   expr_units = 'RNAseq log2(TPM + 1)',
@@ -652,19 +696,28 @@ if (params$load_session) {
   message('Loeading series:')
   load_session(new_id, load_type = "upload_new")
   
-  Sys.sleep(5)
-  # Confirming data has been loaded
-  all_dat <- get_series_info_from_gxpa()
+  max.loops = 10
+  done.loading = F
   
-  if (!any(all_dat$name == str_squish(xpress_project_info$display_name))) {
-    warning('Could not confirm series was successful, checking again')
-    Sys.sleep(10)
-    if (!any(all_dat$name ==  str_squish(xpress_project_info$display_name))) {
-      stop('Could not confirm series was successful')
+  while (!done.loading || max.loops <= 0) {
+    Sys.sleep(5)
+    max.loops = max.loops - 1
+    # Confirming data has been loaded
+    all_dat <- get_series_info_from_gxpa()
+    
+    if (!any(all_dat$name == str_squish(xpress_project_info$display_name))) {
+      warning('Could not confirm series was successful, checking again')
+    } else {
+      done.loading = T
     }
   }
   
-  message('Confirmed series uploaded to GXPA')
+  if (!done.loading) {
+    warning('WARNING: Could not confirm series was successful')
+  } else {
+    message('Confirmed series uploaded to GXPA')
+  }
+  
   datatable(all_dat[all_dat$name ==  str_squish(xpress_project_info$display_name), ], 
             rownames = FALSE,
             caption = 'GXPA Data Description',
@@ -673,8 +726,6 @@ if (params$load_session) {
               paging = FALSE,
               searching = FALSE
             ))
-  
-  
 }
 
 ```
