@@ -20,7 +20,7 @@ params:
   control_list: "list(VSLABL = 'Control', bms_id = 'HuRef', treatment = 'UHR')"
   load_session: FALSE
   additional_metadata: NULL
-  series_descript: 
+  series_descript: NULL
 ---
 
 ```{r setup, results='hide', echo=TRUE, message=FALSE}
