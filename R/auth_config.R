@@ -6,7 +6,8 @@
 #' `GXPA_USERNAME`
 #' @param GXPA_password password for GXPA. Default is to use the environment variable
 #' `GXPA_PASSWORD`
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return user cookie
 #' @details
@@ -23,9 +24,11 @@
 #'
 #' @examples
 #' login_and_get_user_cookie()
-login_and_get_user_cookie <- function(GXPA_username = Sys.getenv("GXPA_USERNAME"),
-                                      GXPA_password = Sys.getenv("GXPA_PASSWORD"),
-                                      server_url = "https://geneatlas.redda.bms.com/") {
+login_and_get_user_cookie <- function(
+    GXPA_username = Sys.getenv("GXPA_USERNAME"),
+    GXPA_password = Sys.getenv("GXPA_PASSWORD"),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
 
   # this is the URL for logging in
   login_url <- paste0(server_url,

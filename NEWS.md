@@ -1,7 +1,8 @@
 # GXPAinterface 0.3.0
 
-Adding template for bringing Xpress 2.0 data into GXPA 
+- Adding template for bringing Xpress 2.0 data into GXPA 
 (parameterized RMarkdown document)
+- Adding GXPA_SERVER environment variable (closes #13)
 
 # GXPAinterface 0.2.2
 
