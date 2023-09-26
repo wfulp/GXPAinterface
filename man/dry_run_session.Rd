@@ -8,7 +8,7 @@ dry_run_session(
   session_id,
   run_type = c("full", "quick"),
   user_cookie = login_and_get_user_cookie(),
-  server_url = "https://geneatlas.redda.bms.com/"
+  server_url = Sys.getenv("GXPA_SERVER", "https://geneatlas.redda.bms.com/")
 )
 }
 \arguments{
@@ -24,7 +24,8 @@ will just do a full dry run)}
 string, then the function will run login_and_get_user_cookie(). So, if
 you provide the cookie then it saves one interaction with the server.}
 
-\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
+\item{server_url}{GXPA server (default GXPA_SERVER environment variable or
+https://geneatlas.redda.bms.com/ if missing)}
 }
 \value{
 Invisibly returns a list with 3 elements: $output has the full html

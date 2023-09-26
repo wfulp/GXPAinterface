@@ -38,6 +38,27 @@ of functions to pre-process the data for importing into GXPA.
   - `check_files_for_GXPA()` to run many checks on expression data and
     metadata
 
+### Xpress 2.0 to GXPA Template
+
+This template is a parameterized RMarkdown document for pulling data
+from Xpress 2.0, for a given Xpress ID, and uploading to GXPA. There are
+other parameters to specify QC entries and additional information you
+may want to pass to GXPA (i.e.  addition metadata and series
+description). The user may chose to load to GXPA through this template
+or save files and load to GXPA manually.
+
+Xpress 2.0 to GXPA template can be used directly and edited as needed.
+For a new report in RStudio select **File -\> New File -\> R Markdown
+-\> From Template -\> Xpress to GXPA Workflow**, or use the
+`rmarkdown::draft()` function code.
+
+``` r
+rmarkdown::draft("xpress_01234_workflow.Rmd",
+  template = "xpress_gxpa_workflow",
+  package = "GXPAinterface"
+)
+```
+
 ## Installation
 
 Install the released version of

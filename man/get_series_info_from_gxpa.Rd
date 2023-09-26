@@ -7,7 +7,7 @@
 get_series_info_from_gxpa(
   series_id = NULL,
   GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
-  server_url = "https://geneatlas.redda.bms.com/"
+  server_url = Sys.getenv("GXPA_SERVER", "https://geneatlas.redda.bms.com/")
 )
 }
 \arguments{
@@ -17,7 +17,8 @@ series information}
 \item{GXPA_TOKEN}{GXPA API token. Default is to use the environment variable
 \code{GXPA_TOKEN}}
 
-\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
+\item{server_url}{GXPA server (default GXPA_SERVER environment variable or
+https://geneatlas.redda.bms.com/ if missing)}
 }
 \value{
 a data.frame of series information for selected datasets, with the following

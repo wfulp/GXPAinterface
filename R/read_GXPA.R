@@ -6,7 +6,8 @@
 #' @param genes select genes
 #' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
 #' `GXPA_TOKEN`
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return
 #'
@@ -32,10 +33,12 @@
 #' dat <- get_data_from_gxpa(series_id = 41, genes = c("CD33", "CD34"))
 #' head(dat)
 #'
-get_data_from_gxpa <- function(series_id,
-                               genes,
-                               GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
-                               server_url = "https://geneatlas.redda.bms.com/") {
+get_data_from_gxpa <- function(
+    series_id,
+    genes,
+    GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
 
   # input catching
   if (missing(series_id)) {
@@ -99,7 +102,8 @@ get_data_from_gxpa <- function(series_id,
 #' series information
 #' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
 #' `GXPA_TOKEN`
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return
 #'
@@ -141,9 +145,11 @@ get_data_from_gxpa <- function(series_id,
 #' # Can get series ID based on dataset name
 #' all_dat$id[all_dat$name == "Beat AML - OHSU"]
 #'
-get_series_info_from_gxpa <- function(series_id = NULL,
-                                      GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
-                                      server_url = "https://geneatlas.redda.bms.com/") {
+get_series_info_from_gxpa <- function(
+    series_id = NULL,
+    GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
   if (is.null(GXPA_TOKEN) ||
     is.na(GXPA_TOKEN) ||
     GXPA_TOKEN == "") {

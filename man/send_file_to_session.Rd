@@ -9,7 +9,7 @@ send_file_to_session(
   filename_local,
   file_save_name,
   user_cookie = login_and_get_user_cookie(),
-  server_url = "https://geneatlas.redda.bms.com/"
+  server_url = Sys.getenv("GXPA_SERVER", "https://geneatlas.redda.bms.com/")
 )
 }
 \arguments{
@@ -21,7 +21,8 @@ send_file_to_session(
 
 \item{user_cookie}{user cookie (default is using \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}})}
 
-\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
+\item{server_url}{GXPA server (default GXPA_SERVER environment variable or
+https://geneatlas.redda.bms.com/ if missing)}
 }
 \value{
 message indicating upload was successful

@@ -6,7 +6,8 @@
 #' @param filename_local input file name, with path, to import
 #' @param file_save_name file name to be saved as in GXPA. Must match a know name (see details)
 #' @param user_cookie user cookie (default is using [login_and_get_user_cookie()])
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @details  The GXPA session needs to exist, so go to the
 #' [GXPA app](https://geneatlas.redda.bms.com/sessions/) to see open
@@ -32,11 +33,13 @@
 #'   file_save_name = "expr.expr.txt"
 #' )
 #' }
-send_file_to_session <- function(session_id,
-                                 filename_local,
-                                 file_save_name,
-                                 user_cookie = login_and_get_user_cookie(),
-                                 server_url = "https://geneatlas.redda.bms.com/") {
+send_file_to_session <- function(
+    session_id,
+    filename_local,
+    file_save_name,
+    user_cookie = login_and_get_user_cookie(),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
   if (!file.exists(filename_local)) {
     stop("filename_local file does not exist: ", filename_local)
   }
@@ -110,7 +113,8 @@ send_file_to_session <- function(session_id,
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run [login_and_get_user_cookie()]. So, if
 #'      you provide the cookie then it saves one interaction with the server.
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return If successful, the session ID (6 characters) will be returned, and
 #'      it can be used for other session functions. If unsuccessful returns
@@ -128,7 +132,8 @@ begin_new_session <- function(
     session_name,
     session_type = c("expr", "GEO", "features", "extract", "analysis"),
     user_cookie = login_and_get_user_cookie(),
-    server_url = "https://geneatlas.redda.bms.com/") {
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
 
   session_type <- match.arg(session_type)
 
@@ -210,7 +215,8 @@ begin_new_session <- function(
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return Invisibly returns a list with 3 elements: $output has the full html
 #'     output of the dry run. $errors has any errors,
@@ -226,10 +232,12 @@ begin_new_session <- function(
 #' tmp <- dry_run_session("X1NBJK", user_cookie = user_cookie)
 #' }
 #'
-dry_run_session <- function(session_id,
-                            run_type = c("full", "quick"),
-                            user_cookie = login_and_get_user_cookie(),
-                            server_url = "https://geneatlas.redda.bms.com/") {
+dry_run_session <- function(
+    session_id,
+    run_type = c("full", "quick"),
+    user_cookie = login_and_get_user_cookie(),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
   run_type <- match.arg(run_type)
 
   # build the URL to access the data and get the csrf token
@@ -310,7 +318,8 @@ dry_run_session <- function(session_id,
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return Invisibly returns the full html output which can be useful in
 #' case you didn't get a success message.
@@ -323,13 +332,15 @@ dry_run_session <- function(session_id,
 #' load_session("X1NBJK", load_type = "load_scores")
 #' }
 #'
-load_session <- function(session_id,
-                         load_type = c("upload_new",
-                                       "update_series",
-                                       "add_new_scores",
-                                       "load_coords"),
-                         user_cookie = login_and_get_user_cookie(),
-                         server_url = "https://geneatlas.redda.bms.com/") {
+load_session <- function(
+    session_id,
+    load_type = c("upload_new",
+                  "update_series",
+                  "add_new_scores",
+                  "load_coords"),
+    user_cookie = login_and_get_user_cookie(),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
   load_type <- match.arg(load_type)
 
   if (load_type == "update_series") {
@@ -396,7 +407,8 @@ load_session <- function(session_id,
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return Invisibly returns the full html output which can be useful in
 #' case you didn't get a success message.
@@ -414,9 +426,11 @@ load_session <- function(session_id,
 #' }
 #'
 
-remove_session <- function(session_id,
-                           user_cookie = login_and_get_user_cookie(),
-                           server_url= "https://geneatlas.redda.bms.com/") {
+remove_session <- function(
+    session_id,
+    user_cookie = login_and_get_user_cookie(),
+    server_url= Sys.getenv("GXPA_SERVER",
+                           "https://geneatlas.redda.bms.com/")) {
 
   # build the URL to access the data and get the csrf token
   post_url = paste0(
@@ -462,7 +476,8 @@ remove_session <- function(session_id,
 #'      [login_and_get_user_cookie()] to get it. If you don't provide the cookie
 #'      string, then the function will run login_and_get_user_cookie(). So, if
 #'      you provide the cookie then it saves one interaction with the server.
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return Invisibly returns the full html output which can be useful in
 #' case you didn't get a success message.
@@ -483,10 +498,11 @@ remove_session <- function(session_id,
 #' }
 #'
 
-remove_series <- function(series_id,
-                          user_cookie = login_and_get_user_cookie(),
-                          server_url = "https://geneatlas.redda.bms.com/") {
-
+remove_series <- function(
+    series_id,
+    user_cookie = login_and_get_user_cookie(),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
   # build the URL to access the data and get the csrf token
   post_url = paste0(server_url, 'delete_data/delete_series')
   resp1 = httr::GET(post_url, httr::set_cookies(sessionid = user_cookie))
@@ -521,7 +537,8 @@ remove_series <- function(series_id,
 #'
 #' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
 #' `GXPA_TOKEN`
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return If successful, a dataframe of sessions and info about
 #' @export
@@ -534,8 +551,10 @@ remove_series <- function(series_id,
 #' out.df[grepl("blueprint", out.df$name), ]
 #' session_id <- out.df[grepl("blueprint", out.df$name), "id"]
 #' }
-get_GXPA_session_list <- function(GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
-                                  server_url = "https://geneatlas.redda.bms.com/") {
+get_GXPA_session_list <- function(
+    GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
 
   session_url <- paste0(server_url, "remote/api")
   dat <- get_info_from_url(session_url, GXPA_TOKEN)
@@ -580,7 +599,8 @@ get_GXPA_session_list <- function(GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
 #' @param session_id GXPA session id
 #' @param GXPA_TOKEN GXPA API token. Default is to use the environment variable
 #' `GXPA_TOKEN`
-#' @param server_url GXPA server (default is https://geneatlas.redda.bms.com/)
+#' @param server_url GXPA server (default GXPA_SERVER environment variable or
+#' https://geneatlas.redda.bms.com/ if missing)
 #'
 #' @return list of session details
 #' @export
@@ -589,9 +609,11 @@ get_GXPA_session_list <- function(GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
 #' \dontrun{
 #' get_GXPA_session_details('5KPU1F')
 #' }
-get_GXPA_session_details <- function(session_id,
-                                     GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
-                                     server_url = "https://geneatlas.redda.bms.com/") {
+get_GXPA_session_details <- function(
+    session_id,
+    GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
+    server_url = Sys.getenv("GXPA_SERVER",
+                            "https://geneatlas.redda.bms.com/")) {
   session_url <- paste0(
     server_url,
     "remote/api?expr_details=1&dir=1&cur_session=",
