@@ -1,3 +1,11 @@
+# GXPAinterface 0.3.0
+
+- Adding template for bringing Xpress 2.0 data into GXPA 
+(parameterized RMarkdown document)
+- Adding GXPA_SERVER environment variable (closes #13)
+- Adding check for blank or "<NA>" gene names in check_files_for_GXPA()
+(closes #17)
+
 # GXPAinterface 0.2.2
 
 Adding internal GitHub Actions for R package building and website creation

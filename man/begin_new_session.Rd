@@ -8,7 +8,7 @@ begin_new_session(
   session_name,
   session_type = c("expr", "GEO", "features", "extract", "analysis"),
   user_cookie = login_and_get_user_cookie(),
-  server_url = "https://geneatlas.redda.bms.com/"
+  server_url = Sys.getenv("GXPA_SERVER", "https://geneatlas.redda.bms.com/")
 )
 }
 \arguments{
@@ -23,7 +23,8 @@ features, extract, analysis}
 string, then the function will run \code{\link[=login_and_get_user_cookie]{login_and_get_user_cookie()}}. So, if
 you provide the cookie then it saves one interaction with the server.}
 
-\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
+\item{server_url}{GXPA server (default GXPA_SERVER environment variable or
+https://geneatlas.redda.bms.com/ if missing)}
 }
 \value{
 If successful, the session ID (6 characters) will be returned, and

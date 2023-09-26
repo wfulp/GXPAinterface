@@ -6,14 +6,15 @@
 \usage{
 get_GXPA_session_list(
   GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
-  server_url = "https://geneatlas.redda.bms.com/"
+  server_url = Sys.getenv("GXPA_SERVER", "https://geneatlas.redda.bms.com/")
 )
 }
 \arguments{
 \item{GXPA_TOKEN}{GXPA API token. Default is to use the environment variable
 \code{GXPA_TOKEN}}
 
-\item{server_url}{GXPA server (default is https://geneatlas.redda.bms.com/)}
+\item{server_url}{GXPA server (default GXPA_SERVER environment variable or
+https://geneatlas.redda.bms.com/ if missing)}
 }
 \value{
 If successful, a dataframe of sessions and info about

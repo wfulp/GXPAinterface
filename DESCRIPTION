@@ -1,6 +1,6 @@
 Package: GXPAinterface
 Title: Access the GXPA API and Pre-process Data for GXPA
-Version: 0.2.2
+Version: 0.3.0
 Authors@R: c(
     person("Jimmy", "Fulp", , "william.fulp@bms.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6888-0794")),
@@ -18,8 +18,15 @@ Imports:
     httr,
     jsonlite
 Suggests: 
+    dplyr,
+    DT,
     purrr,
-    testthat (>= 3.0.0)
+    readr,
+    revealxpress (>= 1.0.5),
+    SiteMinderBMS,
+    stringr,
+    testthat (>= 3.0.0),
+    withr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

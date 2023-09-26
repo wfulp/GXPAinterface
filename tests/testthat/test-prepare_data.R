@@ -57,7 +57,8 @@ test_that("testing series info creation", {
 
 test_that("testing check_files_for_GXPA", {
   run_test_checks <- function(test_expr, test_meta, quote = FALSE) {
-    test_dir <- tempdir()
+    test_dir <- withr::local_tempdir()
+
     utils::write.table(test_expr,
       file = file.path(test_dir, "expr.expr.txt"),
       sep = "\t",
@@ -138,4 +139,25 @@ test_that("testing check_files_for_GXPA", {
     run_test_checks(test_expr, bad_meta),
     "The following variable do not follow standard R variable naming convention:\nfsgs fdfv\nsgs-gdfs\n123fadf"
   )
+
+  bad_expr <- test_expr
+  rownames(bad_expr)[3] <- ""
+  expect_error(
+    run_test_checks(bad_expr, test_meta),
+    'Some of the gene names are blank or "<NA>"'
+  )
+  bad_expr <- test_expr
+  rownames(bad_expr)[3] <- "<NA>"
+  expect_error(
+    run_test_checks(bad_expr, test_meta),
+    'Some of the gene names are blank or "<NA>"'
+  )
+  bad_expr <- as.matrix(test_expr)
+  rownames(bad_expr)[3] <- NA
+  expect_error(
+    run_test_checks(bad_expr, test_meta),
+    "missing values in 'row.names' are not allowed"
+  )
+
 })
+
