@@ -170,5 +170,10 @@ check_files_for_GXPA <- function(expr_file,
     )
   }
 
+  # No gene names are blank or NA
+  if (any(rownames(expr1) %in% c("", "<NA>"))) {
+    stop('Some of the gene names are blank or "<NA>"')
+  }
+
   message("All checks passed")
 }
