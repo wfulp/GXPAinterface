@@ -1,4 +1,4 @@
-# GXPAinterface 0.3.1
+# GXPAinterface 0.3.2
 
 - Using httr::RETRY for reading from GXPA
 
