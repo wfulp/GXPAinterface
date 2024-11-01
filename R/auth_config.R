@@ -35,7 +35,10 @@ login_and_get_user_cookie <- function(
                       "/register/login")
 
   # need to load the form to get the CSRF token
-  resp1 <- httr::GET(login_url)
+  resp1 <- httr::RETRY(
+    verb = "GET",
+    url = login_url
+  )
   csrf_token <- get_cookie_value(resp1, "csrftoken")
 
   # now log in and then get the user cookie
