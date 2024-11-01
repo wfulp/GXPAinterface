@@ -1,3 +1,7 @@
+# GXPAinterface 0.3.1
+
+- Using httr::RETRY for reading from GXPA
+
 # GXPAinterface 0.3.0
 
 - Adding template for bringing Xpress 2.0 data into GXPA 
