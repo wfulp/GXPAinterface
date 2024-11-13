@@ -189,7 +189,9 @@ get_info_from_url <- function(get_url,
   r <- httr::RETRY(
     verb = "GET",
     url = get_url,
-    config = httr::add_headers(Authorization = paste("Token", GXPA_TOKEN))
+    config = httr::add_headers(Authorization = paste("Token", GXPA_TOKEN)),
+    times = 10,
+    httr::timeout(2)
   )
   if (r$status_code != 200) {
     stop("Error (status=", r$status_code, ") while reading url: ", get_url)
