@@ -1,3 +1,7 @@
+# GXPAinterface 0.3.3
+
+- Adding timeout to httr::RETRY when reading from GXPA
+
 # GXPAinterface 0.3.2
 
 - Using httr::RETRY for reading from GXPA
