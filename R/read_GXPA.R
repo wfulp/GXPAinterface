@@ -181,7 +181,7 @@ get_info_from_url <- function(get_url,
     verb = "GET",
     url = get_url,
     config = httr_config,
-    times = 10,
+    times = 3,
     httr::timeout(2)
   )
   if (r$status_code != 200) {

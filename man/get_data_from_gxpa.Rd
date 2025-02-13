@@ -32,7 +32,7 @@ Get data from GXPA for a given series id and genes
 \details{
 Go to \href{https://geneatlas.redda.bms.com/browse/settings}{GXPA Settings}
 to get your token. Some datasets require you to login, so be sure to do
-that before you copy your token.
+that before you copy your token. Some datasets do not need a token.
 
 Token can be set by:
 \itemize{

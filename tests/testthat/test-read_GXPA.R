@@ -7,45 +7,6 @@ test_that("read_GXPA input checking", {
     get_data_from_gxpa(10),
     "genes can't be missing"
   )
-  expect_error(
-    get_data_from_gxpa(10, "AA", GXPA_TOKEN = ""),
-    "GXPA_TOKEN can't be missing"
-  )
-  expect_error(
-    get_data_from_gxpa(10, "AA", GXPA_TOKEN = NA),
-    "GXPA_TOKEN can't be missing"
-  )
-  expect_error(
-    get_data_from_gxpa(10, "AA", GXPA_TOKEN = NULL),
-    "GXPA_TOKEN can't be missing"
-  )
-
-  expect_error(
-    get_series_info_from_gxpa(10, GXPA_TOKEN = ""),
-    "GXPA_TOKEN can't be missing"
-  )
-  expect_error(
-    get_series_info_from_gxpa(10, GXPA_TOKEN = NA),
-    "GXPA_TOKEN can't be missing"
-  )
-  expect_error(
-    get_series_info_from_gxpa(10, GXPA_TOKEN = NULL),
-    "GXPA_TOKEN can't be missing"
-  )
-
-  test_link <- "https://geneatlas.redda.bms.com/series_api/series/?format=json&name_only=1"
-  expect_error(
-    get_info_from_url(test_link, GXPA_TOKEN = ""),
-    "GXPA_TOKEN can't be missing"
-  )
-  expect_error(
-    get_info_from_url(test_link, GXPA_TOKEN = NA),
-    "GXPA_TOKEN can't be missing"
-  )
-  expect_error(
-    get_info_from_url(test_link, GXPA_TOKEN = NULL),
-    "GXPA_TOKEN can't be missing"
-  )
 })
 
 
