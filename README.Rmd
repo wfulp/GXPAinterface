@@ -52,6 +52,33 @@ functions to pre-process the data for importing into GXPA.
    - `make_series_info_file()` to create a series information file
    - `check_files_for_GXPA()` to run many checks on expression data and metadata
 
+### Quick Start Example
+
+
+Here is a example script to grab two genes from TCGA/GTEX (Xena Toil). This
+dataset is open to all without needing to log in and get a token, so you
+don't need a token for it. Other datasets may require it, see below for 
+how to setup the token.
+
+    # load this library (after you install it)
+    library(GXPAinterface)
+    
+    # get the names of all the series in gxpa that you can acces with no token
+    all_dat <- get_series_info_from_gxpa()
+    all_dat$name[1:10]
+
+    # find the one of interest (in this case, the TCGA/GTX Xena dataset)
+    found_rows = all_dat[grep(".*TCGA.*Xena.*", all_dat$name), ]; found_rows
+    series_id = found_rows$id; series_id
+
+    # get PDCD1 and LAG3
+    my.genes = c("PDCD1", "LAG3")
+    df = get_data_from_gxpa(series_id, my.genes)
+
+    # take a peek
+    head(df); dim(df)
+
+
 ### Xpress 2.0 to GXPA Template
 
 This template is a parameterized RMarkdown document for pulling data from 
