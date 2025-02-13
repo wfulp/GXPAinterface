@@ -77,7 +77,7 @@ test_that("testing dry_run() errors", {
 
   expect_error(
     dry_run_session("BAD_ID"),
-    "Session not found"
+    'Session not found or user does not have required permission level'
   )
 
 })

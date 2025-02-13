@@ -1,6 +1,6 @@
 Package: GXPAinterface
 Title: Access the GXPA API and Pre-process Data for GXPA
-Version: 0.3.3
+Version: 0.3.4
 Authors@R: c(
     person("Jimmy", "Fulp", , "william.fulp@bms.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6888-0794")),

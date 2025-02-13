@@ -258,8 +258,11 @@ dry_run_session <- function(
   )
 
   resp_text <- httr::content(resp2, as = "text")
-  if (grepl('not found in visible choices', resp_text)) {
-    stop('Session not found')
+  if (
+    grepl('User does not have required permission level',
+            resp_text)
+  ) {
+    stop('Session not found or user does not have required permission level')
   }
   resp_lines <- unlist(strsplit(resp_text, "\n"))
 

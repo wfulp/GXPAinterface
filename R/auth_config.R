@@ -38,7 +38,7 @@ login_and_get_user_cookie <- function(
   resp1 <- httr::RETRY(
     verb = "GET",
     url = login_url,
-    times = 10,
+    times = 3,
     httr::timeout(2)
   )
   csrf_token <- get_cookie_value(resp1, "csrftoken")

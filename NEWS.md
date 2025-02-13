@@ -1,3 +1,7 @@
+# GXPAinterface 0.3.4
+
+- Allowing for optional token
+
 # GXPAinterface 0.3.3
 
 - Adding timeout to httr::RETRY when reading from GXPA
