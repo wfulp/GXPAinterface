@@ -17,7 +17,7 @@
 #' @details
 #' Go to [GXPA Settings](https://geneatlas.redda.bms.com/browse/settings)
 #' to get your token. Some datasets require you to login, so be sure to do
-#' that before you copy your token.
+#' that before you copy your token. Some datasets do not need a token.
 #'
 #' Token can be set by:
 #'
@@ -46,11 +46,6 @@ get_data_from_gxpa <- function(
   }
   if (missing(genes)) {
     stop("genes can't be missing")
-  }
-  if (is.null(GXPA_TOKEN) ||
-    is.na(GXPA_TOKEN) ||
-    GXPA_TOKEN == "") {
-    stop("GXPA_TOKEN can't be missing")
   }
 
   # build the URL to access the data
@@ -119,7 +114,7 @@ get_data_from_gxpa <- function(
 #' @details
 #' Go to [GXPA Settings](https://geneatlas.redda.bms.com/browse/settings)
 #' to get your token. Some datasets require you to login, so be sure to do
-#' that before you copy your token.
+#' that before you copy your token. Some datasets do not require a token.
 #'
 #' Token can be set by:
 #'
@@ -150,11 +145,6 @@ get_series_info_from_gxpa <- function(
     GXPA_TOKEN = Sys.getenv("GXPA_TOKEN"),
     server_url = Sys.getenv("GXPA_SERVER",
                             "https://geneatlas.redda.bms.com/")) {
-  if (is.null(GXPA_TOKEN) ||
-    is.na(GXPA_TOKEN) ||
-    GXPA_TOKEN == "") {
-    stop("GXPA_TOKEN can't be missing")
-  }
 
   full_dat <- get_info_from_url(
     paste0(
@@ -179,17 +169,18 @@ get_series_info_from_gxpa <- function(
 #' `GXPA_TOKEN`
 get_info_from_url <- function(get_url,
                               GXPA_TOKEN = Sys.getenv("GXPA_TOKEN")) {
-  if (is.null(GXPA_TOKEN) ||
-    is.na(GXPA_TOKEN) ||
-    GXPA_TOKEN == "") {
-    stop("GXPA_TOKEN can't be missing")
-  }
 
+
+  if (is.null(GXPA_TOKEN) || is.na(GXPA_TOKEN) || GXPA_TOKEN == "") {
+    httr_config = NULL
+  } else {
+    httr_config = httr::add_headers(Authorization = paste("Token", GXPA_TOKEN))
+  }
   # grab the data from GXPA
   r <- httr::RETRY(
     verb = "GET",
     url = get_url,
-    config = httr::add_headers(Authorization = paste("Token", GXPA_TOKEN)),
+    config = httr_config,
     times = 10,
     httr::timeout(2)
   )
