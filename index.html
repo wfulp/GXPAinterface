@@ -38,6 +38,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/wfulp/GXPAinterface/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -53,7 +54,7 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><a href="https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/">{GXPAinterface}</a> is an R package with various function to access GXPA API and collection of functions to pre-process the data for importing into GXPA.</p>
+<p><a href="https://wfulp.github.io/GXPAinterface/">{GXPAinterface}</a> is an R package with various function to access GXPA API and collection of functions to pre-process the data for importing into GXPA.</p>
 <ul>
 <li>Importing from GXPA:
 <ul>
@@ -129,39 +130,33 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the released version of <a href="https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/">{GXPAinterface}</a> from BMS RStudio Package Manager (BRAN):</p>
+<p>Install the released version of <a href="https://wfulp.github.io/GXPAinterface/">{GXPAinterface}</a> from GitHub:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_repos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"BMS CRAN mirror"</span> <span class="op">=</span> <span class="st">"http://pm.rdcloud.bms.com:4242/prod-cran/latest"</span>,</span>
-<span>  <span class="st">"BMS RSPM"</span> <span class="op">=</span> <span class="st">"http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"GXPAinterface"</span>, repos <span class="op">=</span> <span class="va">my_repos</span><span class="op">)</span></span></code></pre></div>
-<p>Or install the development version from BMS BioGit with:</p>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span></span>
+<span>  repo <span class="op">=</span> <span class="st">"wfulp/GXPAinterface"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Or install the development version with:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span></span>
-<span>  repo <span class="op">=</span> <span class="st">"IOCT-discovery-preclin/GXPAinterface"</span>, </span>
-<span>  host <span class="op">=</span> <span class="st">"https://biogit.pri.bms.com/api/v3"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>or:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_git</span><span class="op">(</span></span>
-<span>  <span class="st">"https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface.git"</span></span>
+<span>  repo <span class="op">=</span> <span class="st">"wfulp/GXPAinterface"</span>,</span>
+<span>  ref <span class="op">=</span> <span class="st">"devlop"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="note-about-connecting-to-gxpa-api">Note About Connecting to GXPA API<a class="anchor" aria-label="anchor" href="#note-about-connecting-to-gxpa-api"></a>
 </h2>
-<p><a href="https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/">{GXPAinterface}</a> can make use of R environments for accessing the GXPA API. When importing from GXPA your GXPA API token must be provided, and when importing from GXPA your GXPA username and password must be provided. While is it possible to provide these each time the respective function is used, it is more convenient to set these for the current R session, or even set for all sessions.</p>
+<p><a href="https://wfulp.github.io/GXPAinterface/">{GXPAinterface}</a> can make use of R environments for accessing the GXPA API. When importing from GXPA your GXPA API token must be provided, and when importing from GXPA your GXPA username and password must be provided. While is it possible to provide these each time the respective function is used, it is more convenient to set these for the current R session, or even set for all sessions.</p>
 <p>To set the token and login information for the current session:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>GXPA_TOKEN <span class="op">=</span> <span class="st">"MY_GXPA_USER_TOKEN"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>GXPA_SERVER <span class="op">=</span> <span class="st">"MY_GXPA_SERVER"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>GXPA_TOKEN <span class="op">=</span> <span class="st">"MY_GXPA_USER_TOKEN"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>GXPA_USERNAME <span class="op">=</span> <span class="st">"MY_GXPA_USERNAME"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>GXPA_PASSWORD <span class="op">=</span> <span class="st">"MY_GXPA_PASSWORD"</span><span class="op">)</span></span></code></pre></div>
 <p>More convenient is to set the following environment variables in a <code>.Renviron</code> file (<code>usethis::edit_r_environ()</code>):</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>GXPA_TOKEN  <span class="ot">=</span> MY_GXPA_USER_TOKEN</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>GXPA_USERNAME <span class="ot">=</span> MY_GXPA_USERNAME</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>GXPA_PASSWORD <span class="ot">=</span> MY_GXPA_PASSWORD</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>GXPA_SERVER <span class="ot">=</span> GXPA_SERVER</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>GXPA_TOKEN  <span class="ot">=</span> MY_GXPA_USER_TOKEN</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>GXPA_USERNAME <span class="ot">=</span> MY_GXPA_USERNAME</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>GXPA_PASSWORD <span class="ot">=</span> MY_GXPA_PASSWORD</span></code></pre></div>
 <p>These environment variable values will be used automatically if defined in your R session.</p>
 </div>
 <div class="section level2">
@@ -173,8 +168,9 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/issues" class="external-link">Report a bug</a></li>
-<li><a href="https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/wfulp/GXPAinterface/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/wfulp/GXPAinterface/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/wfulp/GXPAinterface" class="external-link">Browse source code</a></li>
 </ul>
 </div>
 
@@ -203,10 +199,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>
-<a href="https://biogit.pri.bms.com/fulpw" class="external-link">Jimmy Fulp</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-6888-0794" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>
-<a href="https://biogit.pri.bms.com/foxb6" class="external-link">Brian Fox</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-6620-3853" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Jimmy Fulp <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-6888-0794" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Brian Fox <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-6620-3853" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -223,7 +217,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://biogit.pri.bms.com/fulpw" class="external-link">Jimmy Fulp</a>, <a href="https://biogit.pri.bms.com/foxb6" class="external-link">Brian Fox</a>.</p>
+  <p>Developed by Jimmy Fulp, Brian Fox.</p>
 </div>
 
 <div class="pkgdown-footer-right">
