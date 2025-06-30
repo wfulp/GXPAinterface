@@ -1,3 +1,7 @@
+# GXPAinterface 1.0.0
+
+- Initial public version
+
 # GXPAinterface 0.3.4
 
 - Allowing for optional token
