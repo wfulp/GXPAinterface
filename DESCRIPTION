@@ -16,11 +16,11 @@ BugReports:
     https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/issues
 Imports:
     httr,
-    jsonlite
+    jsonlite,
+    purrr
 Suggests: 
     dplyr,
     DT,
-    purrr,
     readr,
     revealxpress (>= 1.0.5),
     SiteMinderBMS,

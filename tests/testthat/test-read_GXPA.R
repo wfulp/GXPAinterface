@@ -11,15 +11,15 @@ test_that("read_GXPA input checking", {
 
 
 test_that("read_GXPA bad url testing", {
-  test_link <- "https://geneatlas.redda.bms.com/series_api/series/?format=json&name_only=1"
+  test_link <- "https://demo.needlegenomics.com/series_api/series/?format=json&name_only=1"
   expect_error(
-    get_info_from_url(get_url = "https://geneatlas.redda.bms.com/se"),
-    "Error \\(status=404\\) while reading url: https://geneatlas.redda.bms.com/se"
+    get_info_from_url(get_url = "https://demo.needlegenomics.com/se"),
+    "Error \\(status=404\\) while reading url: https://demo.needlegenomics.com/se"
   )
 
   expect_error(
     get_info_from_url(get_url = test_link, GXPA_TOKEN = "fgsgvfds"),
-    "Error \\(status=401\\) while reading url: https://geneatlas.redda.bms.com/series_api/series/\\?format=json&name_only=1"
+    "Error \\(status=401\\) while reading url: https://demo.needlegenomics.com/series_api/series/\\?format=json&name_only=1"
   )
 })
 
