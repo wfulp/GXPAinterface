@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GXPAinterface</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,11 +88,7 @@ that before you copy your token. Some datasets do not need a token.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">get_data_from_gxpa</span><span class="op">(</span>series_id <span class="op">=</span> <span class="fl">41</span>, genes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD33"</span>, <span class="st">"CD34"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Error in curl::curl_fetch_memory(url, handle = handle): Couldn't resolve host name [geneatlas.redda.bms.com]: Could not resolve host: geneatlas.redda.bms.com</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Request failed [ERROR]. Retrying in 1 seconds...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Error in curl::curl_fetch_memory(url, handle = handle): Couldn't resolve host name [geneatlas.redda.bms.com]: Could not resolve host: geneatlas.redda.bms.com</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Request failed [ERROR]. Retrying in 3.3 seconds...</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in curl::curl_fetch_memory(url, handle = handle):</span> Couldn't resolve host name [geneatlas.redda.bms.com]: Could not resolve host: geneatlas.redda.bms.com</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in get_info_from_url(get_url, GXPA_TOKEN):</span> Error getting content from url: https://demo.needlegenomics.com/series_api/series_data_view/41?sample_labels=1&amp;transpose=1&amp;no_feat_info=1&amp;name=CD33&amp;name=CD34</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'dat' not found</span>
 <span class="r-in"><span></span></span>
@@ -107,7 +103,7 @@ that before you copy your token. Some datasets do not need a token.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
