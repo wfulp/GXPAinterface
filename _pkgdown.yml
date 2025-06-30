@@ -1,4 +1,4 @@
-url: https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/
+url: https://wfulp.github.io/GXPAinterface/
 
 template:
   bootstrap: 5
@@ -6,10 +6,5 @@ template:
 home:
   links:
   - text: Browse source code
-    href: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface
+    href: https://github.com/wfulp/GXPAinterface
 
-authors:
-  Jimmy Fulp:
-    href: https://biogit.pri.bms.com/fulpw
-  Brian Fox:
-    href: https://biogit.pri.bms.com/foxb6
