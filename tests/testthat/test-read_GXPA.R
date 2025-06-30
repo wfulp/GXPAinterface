@@ -26,25 +26,22 @@ test_that("read_GXPA bad url testing", {
 
 
 test_that("read_GXPA output testing", {
-  # confirming series results for 41
+  # confirming series results for 3
   test_data_info <-
     data.frame(
-      Cd34 = c(9.48, 9.10, 9.55, 5.95, 5.91, 6.01, 9.93, 10.24, 9.85, 5.64),
-      Cd33 = c(5.22, 5.22, 5.49, 5.29, 5.29, 5.36, 5.42, 5.11, 5.32, 5.45),
-      cell_type = c(
-        "hypofunc_CD8", "hypofunc_CD8", "hypofunc_CD8",
-        "functional_CD8", "functional_CD8", "functional_CD8",
-        "hypofunc_CD8", "hypofunc_CD8", "hypofunc_CD8",
-        "functional_CD8"
-      )
+      TYK2 = c(11.5165, 11.2788, 11.1443, 11.1332, 11.1507, 11.0768, 11.3049,
+               10.9641, 11.0645, 10.9338),
+      CD34 = c(7.05569, 6.98715, 6.8604, 7.18281, 6.86445, 6.73649, 6.89719,
+               6.73338, 7.1622, 6.78285),
+      cell_type = "Monocytes"
     )
   rownames(test_data_info) <- c(
-    "GSM2107347", "GSM2107348", "GSM2107349", "GSM2107350", "GSM2107351",
-    "GSM2107352", "GSM2107353", "GSM2107354", "GSM2107355", "GSM2107356"
+    "GSM705287", "GSM705288", "GSM705289", "GSM705290", "GSM705291",
+    "GSM705292", "GSM705293", "GSM705294", "GSM705295", "GSM705296"
   )
 
   results_plus <- purrr::quietly(
-    ~ get_data_from_gxpa(41, c("CD33", "CD34",'aasaa'))[1:10, 1:3]
+    ~ get_data_from_gxpa(3, c("Cd34", "Tyk2",'aasaa'))[1:10, 1:3]
   )()
 
   expect_equal(results_plus$result,
@@ -53,7 +50,7 @@ test_that("read_GXPA output testing", {
   )
   expect_equal(results_plus$messages,
                c('These genes not present:\naasaa\n',
-                 'These genes having incorrect case:\nCD33 vs. Cd33\nCD34 vs. Cd34\n')
+                 'These genes having incorrect case:\nCd34 vs. CD34\nTyk2 vs. TYK2\n')
   )
 
 
@@ -61,8 +58,8 @@ test_that("read_GXPA output testing", {
   test_series_info <-
     data.frame(
       id = 41,
-      name = "GSE79858 antigen specific hypofunctional T cells",
-      organism = "mouse",
+      name = "GSE60424 blood subsets in disease BRI",
+      organism = "human",
       perm_id = 1
     )
 
