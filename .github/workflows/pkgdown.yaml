@@ -6,33 +6,35 @@ on:
     branches: [main]
   release:
     types: [published]
-env:
-  R_VERSION: 4.2.1
+permissions: read-all
 jobs:
   pkgdown:
-    runs-on: [ ubuntu22 ]
+    runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GXPA_USERNAME: ${{ secrets.GXPA_USERNAME }}
+      GXPA_PASSWORD: ${{ secrets.GXPA_PASSWORD }}
+      GXPA_SERVER: ${{ secrets.GXPA_SERVER }}
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-pandoc@v2
       - uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: '4.2.1'
-          extra-repositories: http://pm.rdcloud.bms.com/bms-cg-biogit-bran/latest
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+          dependencies: '"hard"'
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: Github-Actions/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           clean: false
           branch: gh-pages

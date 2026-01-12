@@ -32,7 +32,7 @@ login_and_get_user_cookie <- function(
 
   # this is the URL for logging in
   login_url <- paste0(server_url,
-                      "/register/login")
+                      "register/login")
 
   # need to load the form to get the CSRF token
   resp1 <- httr::RETRY(

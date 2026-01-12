@@ -12,9 +12,9 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 ## Overview
 
-[{GXPAinterface}](https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/)
-is an R package with various function to access GXPA API and collection
-of functions to pre-process the data for importing into GXPA.
+[{GXPAinterface}](https://wfulp.github.io/GXPAinterface/) is an R
+package with various function to access GXPA API and collection of
+functions to pre-process the data for importing into GXPA.
 
 - Importing from GXPA:
   - `get_GXPA_session_list()` to see all the sessions already on GXPA
@@ -87,48 +87,37 @@ rmarkdown::draft("xpress_01234_workflow.Rmd",
 ## Installation
 
 Install the released version of
-[{GXPAinterface}](https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/)
-from BMS RStudio Package Manager (BRAN):
-
-``` r
-my_repos <- c(
-  "BMS CRAN mirror" = "http://pm.rdcloud.bms.com:4242/prod-cran/latest",
-  "BMS RSPM" = "http://pm.rdcloud.bms.com:4242/bms-cg-biogit-bran/latest"
-)
-
-install.packages("GXPAinterface", repos = my_repos)
-```
-
-Or install the development version from BMS BioGit with:
+[{GXPAinterface}](https://wfulp.github.io/GXPAinterface/) from GitHub:
 
 ``` r
 remotes::install_github(
-  repo = "IOCT-discovery-preclin/GXPAinterface", 
-  host = "https://biogit.pri.bms.com/api/v3"
+  repo = "wfulp/GXPAinterface"
 )
 ```
 
-or:
+Or install the development version with:
 
 ``` r
-remotes::install_git(
-  "https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface.git"
+remotes::install_github(
+  repo = "wfulp/GXPAinterface",
+  ref = "devlop"
 )
 ```
 
 ## Note About Connecting to GXPA API
 
-[{GXPAinterface}](https://biogit.pri.bms.com/pages/IOCT-discovery-preclin/GXPAinterface/)
-can make use of R environments for accessing the GXPA API. When
-importing from GXPA your GXPA API token must be provided, and when
-importing from GXPA your GXPA username and password must be provided.
-While is it possible to provide these each time the respective function
-is used, it is more convenient to set these for the current R session,
-or even set for all sessions.
+[{GXPAinterface}](https://wfulp.github.io/GXPAinterface/) can make use
+of R environments for accessing the GXPA API. When importing from GXPA
+your GXPA API token must be provided, and when importing from GXPA your
+GXPA username and password must be provided. While is it possible to
+provide these each time the respective function is used, it is more
+convenient to set these for the current R session, or even set for all
+sessions.
 
 To set the token and login information for the current session:
 
 ``` r
+Sys.setenv(GXPA_SERVER = "MY_GXPA_SERVER")
 Sys.setenv(GXPA_TOKEN = "MY_GXPA_USER_TOKEN")
 Sys.setenv(GXPA_USERNAME = "MY_GXPA_USERNAME")
 Sys.setenv(GXPA_PASSWORD = "MY_GXPA_PASSWORD")
@@ -137,6 +126,7 @@ Sys.setenv(GXPA_PASSWORD = "MY_GXPA_PASSWORD")
 More convenient is to set the following environment variables in a
 `.Renviron` file (`usethis::edit_r_environ()`):
 
+    GXPA_SERVER = GXPA_SERVER
     GXPA_TOKEN  = MY_GXPA_USER_TOKEN
     GXPA_USERNAME = MY_GXPA_USERNAME
     GXPA_PASSWORD = MY_GXPA_PASSWORD

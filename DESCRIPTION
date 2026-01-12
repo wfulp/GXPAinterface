@@ -1,26 +1,25 @@
 Package: GXPAinterface
 Title: Access the GXPA API and Pre-process Data for GXPA
-Version: 0.3.4
+Version: 1.0.0
 Authors@R: c(
     person("Jimmy", "Fulp", , "william.fulp@bms.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6888-0794")),
-    person("Brian", "Fox", , "brian.fox@bms.com", role = "aut",
+    person("Brian", "Fox", , "brian@needlegenomics.com", role = "aut",
            comment = c(ORCID = "0000-0001-6620-3853"))
   )
 Description: Various functions to access the GXPA API and another
     collection of functions to pre-process the data for importing into
     GXPA.
 License: MIT + file LICENSE
-URL: https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface
-BugReports: 
-    https://biogit.pri.bms.com/IOCT-discovery-preclin/GXPAinterface/issues
+URL: https://github.com/wfulp/GXPAinterface
+BugReports: https://github.com/wfulp/GXPAinterface/issues
 Imports:
     httr,
-    jsonlite
+    jsonlite,
+    purrr
 Suggests: 
     dplyr,
     DT,
-    purrr,
     readr,
     revealxpress (>= 1.0.5),
     SiteMinderBMS,
